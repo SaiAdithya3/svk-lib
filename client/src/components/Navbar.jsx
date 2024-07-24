@@ -1,26 +1,26 @@
 import React from 'react';
-import { Menu, User, Bell } from 'lucide-react';
+import { Menu, User, Bell, ChevronRight, Search } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 const Navbar = () => {
+  const location = useLocation();
+  const path = location.pathname.split('/').filter((x) => x);
+
   return (
     <>
-      <div className="navbar bg-zinc-50 shadow border border-zinc-100 rounded-3xl">
-        <div className="navbar-start">
-          <div className="dropdown">
-            <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
-              <Menu />
-            </div>
-            <ul
-              tabIndex={0}
-              className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
-              <li><a>Homepage</a></li>
-              <li><a>Portfolio</a></li>
-              <li><a>About</a></li>
+      <div className="navbar sticky top-0 border-b border-zinc-200">
+        <div className="navbar-start flex text-sm font-semibold px-5 breadcrumbs">
+            <ul>
+              <li><a>Dashboard</a></li>
+              <li><a>{path}</a></li>
             </ul>
-          </div>
         </div>
         <div className="navbar-center">
-          <a className="btn btn-ghost text-xl">SKU Library</a>
+          <div className="flex gap-1 items-center border border-slate-300 bg-zinc-50 px-3 rounded-3xl">
+            <Search className='size-5'/>
+            <input type="text" className="pr-8 pl-2 font- popp py-2 bg-zinc-50 rounded-r-3xl overflow-hidden focus:outline-none" placeholder="Search..." />
+          </div>
         </div>
         <div className="navbar-end">
           <button className="btn btn-ghost btn-circle">

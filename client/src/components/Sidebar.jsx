@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
+import { Library, HandHelping, BookCheck, Clock8, ChartColumn } from 'lucide-react';
 
 const Icon = ({ IconComponent, ...props }) => (
   <IconComponent {...props} className="w-5 h-5" />
@@ -19,11 +20,6 @@ const NavItem = ({ to, icon: IconComponent, children, badge }) => {
       >
         <Icon IconComponent={IconComponent} />
         <span>{children}</span>
-        {badge && (
-          <Badge variant="secondary" className="ml-auto">
-            {badge}
-          </Badge>
-        )}
       </Link>
     </li>
   );
@@ -42,7 +38,7 @@ const Sidebar = () => (
       <div className="flex flex-col w-full">
 
         <div className="flex items-center justify-start px-4 h-24 border-b">
-          <img src='https://dial4college.blr1.cdn.digitaloceanspaces.com/pro/375/logo/1696497345.jpg' className="w-20"/>
+          <img src='https://dial4college.blr1.cdn.digitaloceanspaces.com/pro/375/logo/1696497345.jpg' className="w-20" />
           <div className="ml-3 ">
             <h2 className="text-lg font-semibold">Sri Krishna Devaraya </h2>
           </div>
@@ -52,29 +48,26 @@ const Sidebar = () => (
             <NavItem to="/" icon={LayoutDashboardIcon}>
               Dashboard
             </NavItem>
-            <NavItem to="/books" icon={CalendarIcon}>
+            <NavItem to="/books" icon={Library}>
               Books Catalogue
             </NavItem>
-            <NavItem to="/borrow" icon={ClockIcon}>
+            <NavItem to="/borrow" icon={HandHelping}>
               Borrow Books
             </NavItem>
-            <NavItem to="/projects" icon={ProjectorIcon}>
-              Projects
+            <NavItem to="/returnbooks" icon={BookCheck}>
+              Return Books
             </NavItem>
-            <NavItem to="/team" icon={GroupIcon}>
+            <NavItem to="/students" icon={GroupIcon}>
               Students
             </NavItem>
-            <NavItem to="/notes" icon={StickyNoteIcon}>
-              Notes
+            <NavItem to="/overdues" icon={Clock8}>
+              Overdues
             </NavItem>
-            <NavItem to="/benefits" icon={FlagIcon} >
-              Benefits
-            </NavItem>
-            <NavItem to="/documents" icon={FilesIcon}>
-              Documents
+            <NavItem to="/activity" icon={ChartColumn}>
+              Activity log
             </NavItem>
           </NavSection>
-          
+
         </nav>
         <div className="hidden p-4 mt-auto">
           <NavItem to="/settings" icon={SettingsIcon}>
