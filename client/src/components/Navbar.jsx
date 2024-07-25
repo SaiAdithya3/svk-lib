@@ -9,7 +9,7 @@ const Navbar = () => {
 
   return (
     <>
-      <div className="navbar sticky top-0 border-b border-zinc-200">
+      <div className="navbar sticky top-0 border-b bg-white/60 backdrop-blur-sm border-zinc-200">
         <div className="navbar-start flex text-sm font-semibold px-5 breadcrumbs">
             <ul>
               <li><a>Dashboard</a></li>
