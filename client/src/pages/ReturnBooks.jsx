@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import {toast} from 'sonner';
+import { toast } from 'sonner';
+import { Disc2, Search } from 'lucide-react';
 
 const ReturnBooks = () => {
   const [unreturnedBooks, setUnreturnedBooks] = useState(unreturnedBooksData);
   const [selectedBook, setSelectedBook] = useState(null);
   const [isReturning, setIsReturning] = useState(false);
+  const [searchText, setSearchText] = useState('');
 
   const handleReturn = () => {
     if (!selectedBook) {
@@ -15,7 +17,6 @@ const ReturnBooks = () => {
   };
 
   const handleConfirmReturn = () => {
-    // Handle the return logic here (e.g., update the database)
     toast.success(`Book returned: ${selectedBook.title}`);
     setUnreturnedBooks(unreturnedBooks.filter(book => book !== selectedBook));
     setSelectedBook(null);
@@ -24,21 +25,39 @@ const ReturnBooks = () => {
 
   const calculateStatus = (borrowDate) => {
     const dueDate = new Date(borrowDate);
-    dueDate.setDate(dueDate.getDate() + 14); // Assuming a 14-day borrowing period
+    dueDate.setDate(dueDate.getDate() + 14);
     const currentDate = new Date();
     return currentDate > dueDate ? 'Overdue' : 'Before Due';
   };
 
+  const filteredBooks = unreturnedBooks.filter(book =>
+    book.title.toLowerCase().includes(searchText.toLowerCase()) ||
+    book.isbn.toLowerCase().includes(searchText.toLowerCase())
+  );
+
   return (
     <div className="w-full py-6 flex flex-col  items-center">
-      <div className="w-full px-9 border-b sticky top-14 bg-white/40 backdrop-blur-sm pb-4 z-20 flex items-center justify-between">
+      <div className="w-full px-9 border-b sticky top-14 bg-white/60 backdrop-blur-sm pb-4 z-20 flex flex-col items-center justify-between">
         <h1 className="text-2xl text-start w-full font-bold text-gray-800">Return Books</h1>
-        <button
-          className="mt-4 px-8 py-2 bg-zinc-800 shadow text-white rounded-lg"
-          onClick={handleReturn}
-        >
-          Return
-        </button>
+        <div className="w-full py-3 flex justify-between">
+          <div className="w-2/3 px-4 flex bg-zinc-100 items-center gap-2 border border-gray-300 rounded-lg">
+            <Search className='' />
+            <input
+              type="text"
+              className="px py-2 popp rounded-lg bg-zinc-100 w-full focus:outline-none"
+              placeholder="Search by title or ISBN"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+            />
+          </div>
+          <button
+            className="px-8 py-2 bg-zinc-900 shadow flex items-center gap-3 text-white rounded-lg"
+            onClick={handleReturn}
+          >
+            Return
+            <Disc2 className='size-5' />
+          </button>
+        </div>
       </div>
       <div className="w-full px-6 overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
@@ -54,35 +73,39 @@ const ReturnBooks = () => {
               <th className="px-4 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">Status</th>
             </tr>
           </thead>
-          <tbody>
-            {unreturnedBooks.map((book, index) => (
-              <tr
-                key={index}
-                className={`hover:bg-gray-50 popp cursor-pointer ${selectedBook === book ? 'bg-gray-200' : ''}`}
-                onClick={() => setSelectedBook(book)}
-              >
-                <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">
-                  <input
-                    type="checkbox"
-                    checked={selectedBook === book}
-                    onChange={() => setSelectedBook(book)}
-                  />
-                </td>
-                <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.serialNumber}</td>
-                <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.isbn}</td>
-                <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.title}</td>
-                <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.author}</td>
-                <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.borrower.name} (ID: {book.borrower.id})</td>
-                <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.borrowDate}</td>
-                <td className="px-4 py-4 border-b border-gray-200 text-xs text-gray-700">
-                  <span className={`border w-full  rounded-full py-1 ${calculateStatus(book.borrowDate) === 'Overdue' ? 'border-red-500 px-4 bg-red-200 text-red-800' : 'border-green-500 bg-green-200 px-3 text-green-800'
-                    }`}>
-                    {calculateStatus(book.borrowDate)}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
+          {filteredBooks.length === 0 ? (
+            <p className=" w-full text-center text-gray-600">No overdue books at the moment.</p>
+          ) : (
+            <tbody>
+              {filteredBooks.map((book, index) => (
+                <tr
+                  key={index}
+                  className={`hover:bg-gray-50 popp cursor-pointer ${selectedBook === book ? 'bg-gray-200' : ''}`}
+                  onClick={() => setSelectedBook(book)}
+                >
+                  <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">
+                    <input
+                      type="checkbox"
+                      checked={selectedBook === book}
+                      onChange={() => setSelectedBook(book)}
+                    />
+                  </td>
+                  <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.serialNumber}</td>
+                  <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.isbn}</td>
+                  <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.title}</td>
+                  <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.author}</td>
+                  <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.borrower.name} (ID: {book.borrower.id})</td>
+                  <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.borrowDate}</td>
+                  <td className="px-4 py-4 border-b border-gray-200 text-xs text-gray-700">
+                    <span className={`border w-full  rounded-full py-1 ${calculateStatus(book.borrowDate) === 'Overdue' ? 'border-red-500 px-4 bg-red-200 text-red-800' : 'border-green-500 bg-green-200 px-3 text-green-800'
+                      }`}>
+                      {calculateStatus(book.borrowDate)}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          )}
         </table>
       </div>
 

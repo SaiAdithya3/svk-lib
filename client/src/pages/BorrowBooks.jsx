@@ -27,7 +27,6 @@ const BorrowBooks = () => {
     setIsBorrowing(true);
   };
   const handleConfirmBorrow = () => {
-    // Handle the borrow logic here (e.g., update the database)
     toast.success(`Books borrowed by ${studentDetails.name} (ID: ${studentDetails.id})`);
     setSelectedBooks([]);
     setStudentDetails({ name: '', id: '' });
@@ -48,8 +47,8 @@ const BorrowBooks = () => {
 
   return (
     <div className="w-full py-6 flex flex-col px-6 items-center">
-      <h1 className="text-2xl text-start w-full font-bold text-gray-800 mb-4">Borrow Books</h1>
-      <div className="w-full flex mb-4  justify-between">
+      <h1 className="text-2xl px-3 text-start w-full font-bold text-gray-800 mb-4">Borrow Books</h1>
+      <div className="w-full px-3 flex mb-4  justify-between">
         <div className="w-2/3 px-4 flex bg-zinc-100 items-center gap-2 border border-gray-300 rounded-lg">
         <Search className=''/>
           <input

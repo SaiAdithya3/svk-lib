@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import * as XLSX from 'xlsx';
+import { Search, Disc2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Overdue = () => {
-  // Example overdue books data
+  const navigate = useNavigate();
   const [overdueBooks, setOverdueBooks] = useState([
     {
       serialNumber: 1,
@@ -26,6 +28,13 @@ const Overdue = () => {
     },
     // Add more overdue books as needed
   ]);
+  const [searchText, setSearchText] = useState('');
+
+  // Function to handle borrowing books
+  const handleBorrow = () => {
+
+    navigate('/borrow');
+  };
 
   // Function to handle exporting data to Excel
   const handleExportToExcel = () => {
@@ -35,21 +44,45 @@ const Overdue = () => {
     XLSX.writeFile(workbook, 'OverdueBooks.xlsx');
   };
 
+  const filteredBooks = overdueBooks.filter(
+    (book) =>
+      book.title.toLowerCase().includes(searchText.toLowerCase()) ||
+      book.isbn.toLowerCase().includes(searchText.toLowerCase())
+  );
+
   return (
     <div className="w-full py-6 flex flex-col px-6 items-center">
       <h1 className="text-2xl text-start w-full font-bold text-gray-800 mb-4">Overdue Books</h1>
-      
-      {overdueBooks.length === 0 ? (
+      <div className="flex w-full py-4 px-3 items-center justify-between">
+
+        <div className="w-2/3 px-4 flex bg-zinc-100 items-center gap-2 border border-gray-300 rounded-lg">
+          <Search className='' />
+          <input
+            type="text"
+            className="px py-2 popp rounded-lg bg-zinc-100 w-full focus:outline-none"
+            placeholder="Search by title or ISBN"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+          />
+        </div>
+        <button
+          className="px-8 py-2 bg-zinc-900 shadow flex items-center gap-3 text-white rounded-lg"
+          onClick={handleBorrow}
+        >
+          Borrow
+          <Disc2 className='size-5' />
+        </button>
+        <button
+          className=" px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md"
+          onClick={handleExportToExcel}
+        >
+          Export to Excel
+        </button>
+      </div>
+      {filteredBooks.length === 0 ? (
         <p className="text-gray-600">No overdue books at the moment.</p>
       ) : (
         <>
-          <button
-            className="mb-4 px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md"
-            onClick={handleExportToExcel}
-          >
-            Export to Excel
-          </button>
-
           <div className="w-full overflow-x-auto">
             <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
               <thead>
@@ -65,7 +98,7 @@ const Overdue = () => {
                 </tr>
               </thead>
               <tbody>
-                {overdueBooks.map((book, index) => (
+                {filteredBooks.map((book, index) => (
                   <tr key={index} className="hover:bg-gray-50 popp">
                     <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.serialNumber}</td>
                     <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.isbn}</td>
