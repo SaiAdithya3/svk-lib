@@ -14,7 +14,9 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.25.1",
-    "tailwind-setup": "^2.2.0"
+    "sonner": "^1.5.0",
+    "tailwind-setup": "^2.2.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",

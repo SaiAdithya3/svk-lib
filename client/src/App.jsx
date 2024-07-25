@@ -10,6 +10,7 @@ import Overdue from './pages/Overdue';
 import ActivityLog from './pages/ActivityLog';
 import Navbar from './components/Navbar';
 import AddNewBook from './components/AddNewBook';
+import {Toaster} from 'sonner';
 
 const App = () => {
   return (
@@ -25,12 +26,12 @@ const App = () => {
             <Route path="/borrow" element={<BorrowBooks />} />
             <Route path="/returnbooks" element={<ReturnBooks />} />
             <Route path="/overdues" element={<Overdue />} />
-            <Route path="/acitvity" element={<ActivityLog />} />
+            <Route path="/activity" element={<ActivityLog />} />
             <Route path="/addnew" element={<AddNewBook />} />
-            <Route path="/login" element={<Login />} />
             <Route path="*" element={<Dashboard />} />
           </Routes>
         </div>
+        <Toaster richColors position='top-center' />
       </div>
     </>
   )
