@@ -54,7 +54,6 @@ const Overdue = () => {
     <div className="w-full py-6 flex flex-col px-6 items-center">
       <h1 className="text-2xl text-start w-full font-bold text-gray-800 mb-4">Overdue Books</h1>
       <div className="flex w-full py-4 px-3 items-center justify-between">
-
         <div className="w-2/3 px-4 flex bg-zinc-100 items-center gap-2 border border-gray-300 rounded-lg">
           <Search className='' />
           <input
@@ -65,19 +64,21 @@ const Overdue = () => {
             onChange={(e) => setSearchText(e.target.value)}
           />
         </div>
-        <button
-          className="px-8 py-2 bg-zinc-900 shadow flex items-center gap-3 text-white rounded-lg"
-          onClick={handleBorrow}
-        >
-          Borrow
-          <Disc2 className='size-5' />
-        </button>
-        <button
-          className=" px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md"
-          onClick={handleExportToExcel}
-        >
-          Export to Excel
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            className="px-8 py-2 bg-zinc-900 shadow flex items-center gap-3 text-white rounded-lg"
+            onClick={handleBorrow}
+          >
+            Borrow
+            <Disc2 className='size-5' />
+          </button>
+          <button
+            className=" px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md"
+            onClick={handleExportToExcel}
+          >
+            Export to Excel
+          </button>
+        </div>
       </div>
       {filteredBooks.length === 0 ? (
         <p className="text-gray-600">No overdue books at the moment.</p>
