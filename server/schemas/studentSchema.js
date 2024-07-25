@@ -24,3 +24,5 @@ const studentSchema = new mongoose.Schema({
     type: String,
   },
 });
+
+export default mongoose.model("student", studentSchema);

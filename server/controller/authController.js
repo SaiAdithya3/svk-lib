@@ -1,4 +1,4 @@
-import Admin from "../schemas/adminSchema";
+import Admin from "../schemas/adminSchema.js";
 
 export const login = async (req, res) => {
   const { username, password } = req.body;

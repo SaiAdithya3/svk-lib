@@ -1,44 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import BookModal from '../components/BookModal'; 
+import BookModal from '../components/BookModal';
+import { getBooks } from '../services/services';
 
 const BooksCatalogue = () => {
   const [searchText, setSearchText] = useState('');
   const [selectedBook, setSelectedBook] = useState(null);
+  const [books, setBooks] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const navigate = useNavigate();
 
-  const books = [
-    {
-      serialNumber: 1,
-      isbn: '978-0131103627',
-      title: 'Introduction to Algorithms',
-      location: 'Shelf A1',
-      author: 'Thomas H. Cormen',
-      description: 'A comprehensive book on algorithms.',
-      image: 'path_to_image',
-      totalCount: 5,
-      availableCount: 3,
-    },
-    {
-      serialNumber: 2,
-      isbn: '978-0132350884',
-      title: 'Clean Code',
-      location: 'Shelf B3',
-      author: 'Robert C. Martin',
-      description: 'A handbook of agile software craftsmanship.',
-      image: 'path_to_image',
-      totalCount: 3,
-      availableCount: 1,
-    },
-    // Add more books as needed
-  ];
+  useEffect(() => {
+    fetchBooks(currentPage, searchText);
+  }, [currentPage, searchText]);
 
-  const filteredBooks = books.filter(book =>
-    book.title.toLowerCase().includes(searchText.toLowerCase()) ||
-    book.isbn.toLowerCase().includes(searchText.toLowerCase())
-  );
-  //, author, location
+  const fetchBooks = async (page, search) => {
+    try {
+      const response = await getBooks(page, search);
+      setBooks(response.books);
+      console.log(response.books);
+      setTotalPages(response.totalPages);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchText(e.target.value);
+    setCurrentPage(1); 
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+  
 
   return (
     <div className="w-full py-6 flex flex-col px-6 items-center">
@@ -47,9 +46,9 @@ const BooksCatalogue = () => {
         <input
           type="text"
           className="px-4 py-2 border popp border-gray-300 rounded-lg w-2/3"
-          placeholder="Search by title or ISBN"
+          placeholder="Search by title, ISBN, author, or location"
           value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
+          onChange={handleSearchChange}
         />
         <button
           className="px-4 py-2 bg-zinc-800 shadow text-white rounded-lg"
@@ -61,7 +60,7 @@ const BooksCatalogue = () => {
       <div className="w-full overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
           <thead>
-            <tr className='popp'>
+            <tr className="popp">
               <th className="px-3 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">S.No</th>
               <th className="px-4 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">ISBN</th>
               <th className="px-4 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">Title</th>
@@ -71,18 +70,36 @@ const BooksCatalogue = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredBooks.map((book, index) => (
+            {books.map((book, index) => (
               <tr key={index} className="hover:bg-gray-50 popp cursor-pointer" onClick={() => setSelectedBook(book)}>
-                <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.serialNumber}</td>
+                <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.bookid}</td>
                 <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.isbn}</td>
                 <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.title}</td>
                 <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.author}</td>
-                <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.availableCount} / {book.totalCount}</td>
+                <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.availableCopies} / {book.totalCopies}</td>
                 <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.location}</td>
               </tr>
             ))}
           </tbody>
         </table>
+      </div>
+
+      <div className="w-full flex justify-between mt-4">
+        <button
+          className="px-4 py-2 bg-gray-300 shadow text-black rounded-lg"
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+        <span className="px-4 py-2">{`Page ${currentPage} of ${totalPages}`}</span>
+        <button
+          className="px-4 py-2 bg-gray-300 shadow text-black rounded-lg"
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          Next
+        </button>
       </div>
 
       {selectedBook && (

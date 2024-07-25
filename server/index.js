@@ -2,19 +2,31 @@ import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from "dotenv";
-import ConnectDB from "./config/db.js";
+import { connectDB } from "./config/db.js";
 const app = express();
+import authRoutes from "./routes/authRoutes.js";
+import loanRoutes from "./routes/loanRoutes.js";
+import bookRoutes from "./routes/bookRoutes.js";
 
-app.use(cors());
+app.use(cors(
+  {
+    origin: "http://localhost:5173",
+    credentials: true
+  }
+));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 dotenv.config();
 
+
 app.get("/", (req, res) => {
   res.send("Library Management System - Server");
 });
+app.use("/auth", authRoutes);
+app.use("/loan", loanRoutes);
+app.use("/book", bookRoutes);
 
 app.listen(3000, () => {
-  ConnectDB();
+  connectDB();
   console.log("We are on port 3000");
 });

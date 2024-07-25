@@ -1,31 +1,62 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Disc2, Search } from 'lucide-react';
+import { Disc2, LoaderPinwheel, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import BookModal from '../components/BookModal';
-
+import { searchBooks } from '../services/services';
 
 const BorrowBooks = () => {
   const [searchText, setSearchText] = useState('');
+  const [books, setBooks] = useState([]);
   const [selectedBooks, setSelectedBooks] = useState([]);
   const [studentDetails, setStudentDetails] = useState({ name: '', id: '' });
   const [isBorrowing, setIsBorrowing] = useState(false);
-  const navigate = useNavigate();
   const [viewBook, setViewBook] = useState(null);
+  const [debounceTimeout, setDebounceTimeout] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const filteredBooks = books.filter(book =>
-    book.title.toLowerCase().includes(searchText.toLowerCase()) ||
-    book.isbn.toLowerCase().includes(searchText.toLowerCase())
-  );
+  const navigate = useNavigate();
+
+  const fetchBooks = async (query) => {
+    setLoading(true);
+    try {
+      const response = await searchBooks(query);
+      setBooks(response.books);
+    } catch (error) {
+      console.error('Error fetching books:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
+    setSearchText(query);
+
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+    }
+
+    setDebounceTimeout(
+      setTimeout(() => {
+        fetchBooks(query);
+      }, 2000)
+    );
+  };
 
   const handleBorrow = () => {
     if (selectedBooks.length === 0) {
-      toast.error("Please select at least one book to borrow.");
+      toast.error('Please select at least one book to borrow.');
       return;
     }
-    console.log(selectedBooks);
+    if (selectedBooks.length > 5) {
+      toast.error('You cannot borrow more than 5 books at a time.');
+      return;
+    }
     setIsBorrowing(true);
   };
+  
+
   const handleConfirmBorrow = () => {
     toast.success(`Books borrowed by ${studentDetails.name} (ID: ${studentDetails.id})`);
     setSelectedBooks([]);
@@ -33,30 +64,35 @@ const BorrowBooks = () => {
     setIsBorrowing(false);
   };
 
-  const handleBookDetails = (book) => {
-    setView(`/book-details/${book.isbn}`);
-  };
-
   const handleSelectBook = (book) => {
     if (selectedBooks.includes(book)) {
-      setSelectedBooks(selectedBooks.filter(b => b !== book));
+      setSelectedBooks(selectedBooks.filter((b) => b !== book));
     } else {
-      setSelectedBooks([...selectedBooks, book]);
+      if (selectedBooks.length < 5) {
+        setSelectedBooks([...selectedBooks, book]);
+      } else {
+        toast.error('You can only select up to 5 books.');
+      }
     }
   };
 
+
+  const handleRemoveBook = (book) => {
+    setSelectedBooks(selectedBooks.filter((b) => b !== book));
+  };
+
   return (
-    <div className="w-full py-6 flex flex-col px-6 items-center">
+    <div className="w-full py-6 flex flex-col px-6 items-center relative">
       <h1 className="text-2xl px-3 text-start w-full font-bold text-gray-800 mb-4">Borrow Books</h1>
-      <div className="w-full px-3 flex mb-4  justify-between">
+      <div className="w-full px-3 flex mb-4 justify-between">
         <div className="w-2/3 px-4 flex bg-zinc-100 items-center gap-2 border border-gray-300 rounded-lg">
-        <Search className=''/>
+          <Search className='' />
           <input
             type="text"
             className="px py-2 popp rounded-lg bg-zinc-100 w-full focus:outline-none"
             placeholder="Search by title or ISBN"
             value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
+            onChange={handleSearchChange}
           />
         </div>
         <button
@@ -67,58 +103,68 @@ const BorrowBooks = () => {
           <Disc2 className='size-5' />
         </button>
       </div>
-      <div className="w-full overflow-x-auto">
-        <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
-          <thead>
-            <tr className='popp'>
-              <th className="px-3 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">Select</th>
-              <th className="px-3 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">S.No</th>
-              <th className="px-4 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">ISBN</th>
-              <th className="px-4 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">Title</th>
-              <th className="px-4 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">Author</th>
-              <th className="px-4 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">Count</th>
-              <th className="px-4 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">Details</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredBooks.map((book, index) => (
-              <tr
-                key={index}
-                className={`hover:bg-gray-50 popp cursor-pointer ${selectedBooks.includes(book) ? 'bg-gray-200' : ''}`}
-                onClick={() => handleSelectBook(book)}
-              >
-                <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">
-                  <input
-                    type="checkbox"
-                    checked={selectedBooks.includes(book)}
-                    onChange={() => handleSelectBook(book)}
-                  />
-                </td>
-                <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.serialNumber}</td>
-                <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.isbn}</td>
-                <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.title}</td>
-                <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.author}</td>
-                <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.availableCount} / {book.totalCount}</td>
-                <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">
-                  <button
-                    className="px-3 py-1 bg-zinc-700 text-white rounded-lg"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setViewBook(book);
-                    }}
-                  >
-                    Details
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
 
+      {loading ? (
+        <div className="w-full flex items-center justify-center py-6">
+          <LoaderPinwheel className="w-10 h-10 text-gray-600 animate-spin" />
+        </div>
+      ) : books.length === 0 ? (
+        <div className="w-full flex items-center justify-center py-6">
+          <p className="text-gray-600">No books found matching your criteria.</p>
+        </div>
+      ) : (
+        <div className="w-full overflow-x-auto">
+          <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
+            <thead>
+              <tr className='popp'>
+                <th className="px-3 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">Select</th>
+                <th className="px-3 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">S.No</th>
+                <th className="px-4 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">ISBN</th>
+                <th className="px-4 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">Title</th>
+                <th className="px-4 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">Author</th>
+                <th className="px-4 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">Count</th>
+                <th className="px-4 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              {books.map((book, index) => (
+                <tr
+                  key={index}
+                  className={`hover:bg-gray-50 popp cursor-pointer ${selectedBooks.includes(book) ? 'bg-gray-200' : ''}`}
+                  onClick={() => handleSelectBook(book)}
+                >
+                  <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">
+                    <input
+                      type="checkbox"
+                      checked={selectedBooks.includes(book)}
+                      onChange={() => handleSelectBook(book)}
+                    />
+                  </td>
+                  <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.bookid}</td>
+                  <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.isbn}</td>
+                  <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.title}</td>
+                  <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.author}</td>
+                  <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.availableCount} / {book.totalCount}</td>
+                  <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">
+                    <button
+                      className="px-3 py-1 bg-zinc-700 text-white rounded-lg"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setViewBook(book);
+                      }}
+                    >
+                      Details
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {isBorrowing && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
+        <div className="fixed z-50 inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
           <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all max-w-md w-full">
             <div className="bg-gray-100 px-4 py-3 flex justify-between items-center">
               <h2 className="text-lg font-semibold text-gray-700">Student Details</h2>
@@ -147,7 +193,9 @@ const BorrowBooks = () => {
               <div className="w-full flex flex-col">
                 <h1 className='text-md font-semibold px-2 py-2'>Review books</h1>
                 {selectedBooks && selectedBooks.map((book) => (
-                  <p className='px-2 py-1 popp' key={book.isbn}> 	&rArr;	{book.title} ({book.author})</p>
+                  <p className='px-2 py-1 popp' key={book.isbn}>
+                    &rArr; {book.title} ({book.author})
+                  </p>
                 ))}
               </div>
               <button
@@ -164,77 +212,30 @@ const BorrowBooks = () => {
       {viewBook && (
         <BookModal book={viewBook} onClose={() => setViewBook(null)} />
       )}
+
+      {/* Floating Card */}
+      <div className="fixed bottom-4 right-4 bg-white border z-0 border-gray-200 shadow-lg rounded-lg p-4 ">
+        <h3 className="text-lg font-semibold text-gray-800 mb-2">Selected Books</h3>
+        {selectedBooks.length === 0 ? (
+          <p className="text-gray-600">No books selected.</p>
+        ) : (
+          <ul className="list-disc list-inside space-y-1 text-gray-700">
+            {selectedBooks.map((book) => (
+              <li key={book.isbn} className="border-b py-1 text-sm flex justify-between items-center">
+                {book.title} ({book.author})
+                <button
+                  className="ml-2 px-2 py-1 bg-red-600 text-white rounded-lg text-xs"
+                  onClick={() => handleRemoveBook(book)}
+                >
+                  Remove
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 };
-
-const books = [
-  {
-    serialNumber: 1,
-    isbn: '978-0131103627',
-    title: 'Introduction to Algorithms',
-    location: 'Shelf A1',
-    author: 'Thomas H. Cormen',
-    description: 'A comprehensive book on algorithms.',
-    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTRI7feo6_qem1JTMuRBotK7a4rzMlHK-tc9Q&s',
-    totalCount: 5,
-    availableCount: 3,
-  },
-  {
-    serialNumber: 2,
-    isbn: '978-0132350884',
-    title: 'Clean Code',
-    location: 'Shelf B3',
-    author: 'Robert C. Martin',
-    description: 'A handbook of agile software craftsmanship.',
-    image: 'path_to_image',
-    totalCount: 3,
-    availableCount: 1,
-  },
-  {
-    serialNumber: 3,
-    isbn: '978-0132350884',
-    title: 'Clean Code',
-    location: 'Shelf B3',
-    author: 'Robert C. Martin',
-    description: 'A handbook of agile software craftsmanship.',
-    image: 'path_to_image',
-    totalCount: 3,
-    availableCount: 1,
-  },
-  {
-    serialNumber: 4,
-    isbn: '978-0132350884',
-    title: 'Clean Code',
-    location: 'Shelf B3',
-    author: 'Robert C. Martin',
-    description: 'A handbook of agile software craftsmanship.',
-    image: 'path_to_image',
-    totalCount: 3,
-    availableCount: 1,
-  },
-  {
-    serialNumber: 5,
-    isbn: '978-0132350884',
-    title: 'Clean Code',
-    location: 'Shelf B3',
-    author: 'Robert C. Martin',
-    description: 'A handbook of agile software craftsmanship.',
-    image: 'path_to_image',
-    totalCount: 3,
-    availableCount: 1,
-  },
-  {
-    serialNumber: 6,
-    isbn: '978-0132350884',
-    title: 'Clean Code',
-    location: 'Shelf B3',
-    author: 'Robert C. Martin',
-    description: 'A handbook of agile software craftsmanship.',
-    image: 'path_to_image',
-    totalCount: 3,
-    availableCount: 1,
-  },
-];
 
 export default BorrowBooks;

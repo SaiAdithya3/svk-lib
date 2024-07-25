@@ -5,7 +5,7 @@ import {
   overdue,
   studentOverdue,
   getBookLoans,
-} from "../controller/loanController";
+} from "../controller/loanController.js";
 
 const router = express.Router();
 
@@ -17,7 +17,7 @@ router.get("/overdue", overdue);
 
 router.get("/overdue-student", studentOverdue);
 
-router.get("/loansbybook/:bookId", getBookLoans); // only return active loans for the book
+router.get("/loansbybook/:bookId", getBookLoans);
 
 
 export default router;

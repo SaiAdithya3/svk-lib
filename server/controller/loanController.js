@@ -1,8 +1,8 @@
-import bookSchema from "../schemas/bookSchema";
-import loanSchema from "../schemas/loanSchema";
-import studentSchema from "../schemas/studentSchema";
-import { generateQRCode } from "../utils/qrCodeHelper";
-import { sendEmail } from "../utils/emailHelper";
+import bookSchema from "../schemas/bookSchema.js";
+import loanSchema from "../schemas/loanSchema.js";
+import studentSchema from "../schemas/studentSchema.js";
+import { generateQRCode } from "../utils/qrCodeHelper.js";
+import { sendEmail } from "../utils/emailHelper.js";
 
 export const addLoan = async (req, res) => {
   const { studentId, bookIds } = req.body;
@@ -90,7 +90,7 @@ export const returnLoan = async (req, res) => {
   }
 };
 
-const OVERDUE_DAYS = 7;
+const OVERDUE_DAYS = process.env.OVERDUE_DAYS || 7;
 
 export const overdue = async (req, res) => {
   try {

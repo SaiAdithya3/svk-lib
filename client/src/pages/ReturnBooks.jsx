@@ -67,7 +67,6 @@ const ReturnBooks = () => {
               <th className="px-3 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">S.No</th>
               <th className="px-4 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">ISBN</th>
               <th className="px-4 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">Title</th>
-              <th className="px-4 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">Author</th>
               <th className="px-4 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">Borrower</th>
               <th className="px-4 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">Borrow Date</th>
               <th className="px-4 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">Status</th>
@@ -93,7 +92,6 @@ const ReturnBooks = () => {
                   <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.serialNumber}</td>
                   <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.isbn}</td>
                   <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.title}</td>
-                  <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.author}</td>
                   <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.borrower.name} (ID: {book.borrower.id})</td>
                   <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.borrowDate}</td>
                   <td className="px-4 py-4 border-b border-gray-200 text-xs text-gray-700">

@@ -1,17 +1,20 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const bookSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
   },
-  id: {
+  bookid: {
     type: String,
-    required: true,
+    unique: true,
+  },
+  isbn: {
+    type: String,
+    unique: true,
   },
   author: {
     type: String,
-    required: true,
   },
   genre: {
     type: String,
@@ -21,16 +24,13 @@ const bookSchema = new mongoose.Schema({
   },
   totalCopies: {
     type: Number,
-    required: true,
   },
   availableCopies: {
     type: Number,
-    required: true,
   },
   location: {
     type: String,
-    required: true,
   },
 });
 
-export default mongoose.model("Book", bookSchema);
+export default mongoose.model('Book', bookSchema);
