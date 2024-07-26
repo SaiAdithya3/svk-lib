@@ -14,7 +14,6 @@ export const sendEmail = async (email, name, qrCode) => {
     to: email,
     subject: 'Library Loan QR Code',
     html: `<p>Dear ${name},</p>
-           <p>Please find your QR code for the borrowed books below:</p>
            <img src="${qrCode}" alt="QR Code" />`
   };
 

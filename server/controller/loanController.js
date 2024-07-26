@@ -10,8 +10,8 @@ export const addLoan = async (req, res) => {
   try {
     const student = await studentSchema.findOne({ studentId });
     if (!student) return res.status(404).json({ message: "Student not found" });
-
-    const books = await bookSchema.find({ id: { $in: bookIds } });
+    console.log(bookIds);
+    const books = await bookSchema.find({ bookid: { $in: bookIds } });
     if (books.length !== bookIds.length)
       return res.status(404).json({ message: "Book not found" });
 
