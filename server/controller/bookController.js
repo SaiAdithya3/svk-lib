@@ -81,7 +81,6 @@ export const getBooks = async (req, res) => {
 
 export const searchbook = async (req, res) => {
   const { query } = req.query;
-  // console.log('Search Query:', query); // Log query to verify
   try {
     const books = await Book.find({
       $or: [
@@ -90,7 +89,6 @@ export const searchbook = async (req, res) => {
         { author: { $regex: query, $options: 'i' } },
       ],
     });
-    // console.log('Books Found:', books); // Log books to verify
     res.json({ books });
   } catch (error) {
     console.error('Error fetching books:', error);
