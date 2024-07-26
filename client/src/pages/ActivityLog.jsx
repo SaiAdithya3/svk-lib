@@ -1,25 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { fetchAllLoans } from '../services/services';
 
 const ActivityLog = () => {
-  // Example activity logs data
-  const [activityLogs, setActivityLogs] = useState([
-    {
-      id: 1,
-      date: '2024-07-22',
-      action: 'Borrowed Book',
-      details: 'Introduction to Algorithms was borrowed by John Doe.',
-    },
-    {
-      id: 2,
-      date: '2024-07-23',
-      action: 'Returned Book',
-      details: 'Clean Code was returned by Jane Smith.',
-    },
-    // Add more activity logs as needed
-  ]);
-
+  const [bookLoans, setBookLoans] = useState([]);
   const [searchText, setSearchText] = useState('');
-  const filteredLogs = activityLogs.filter(log =>
+
+  useEffect(() => {
+    const fetchBookLoans = async () => {
+      try {
+        const response = await fetchAllLoans();
+        console.log('API Response:', response); 
+
+        if (!Array.isArray(response)) {
+          throw new Error('Expected response to be an array');
+        }
+
+        // Format the response
+        const formattedLogs = response.map(loan => ({
+          id: loan._id,
+          date: new Date(loan.date).toLocaleDateString(), // Format date if needed
+          action: loan.status === 'borrowed' ? 'Borrowed Book' : 'Returned Book',
+          details: (
+            loan.bookId && Array.isArray(loan.bookId) ? 
+            `${loan.bookId.map(book => book.title).join(', ')} was ${loan.status === 'borrowed' ? 'borrowed' : 'returned'} by ${loan.studentId.name}.` :
+            `Error: Book details not available for loan ID ${loan._id}`
+          )
+        }));
+
+        setBookLoans(formattedLogs);
+      } catch (error) {
+        console.error('Error fetching book loans:', error);
+      }
+    };
+
+    fetchBookLoans();
+  }, []);
+
+  const filteredLogs = bookLoans.filter(log =>
     log.action.toLowerCase().includes(searchText.toLowerCase()) ||
     log.details.toLowerCase().includes(searchText.toLowerCase())
   );
@@ -64,8 +81,6 @@ const ActivityLog = () => {
           </tbody>
         </table>
       </div>
-      
-      {/* Pagination can be added here if necessary */}
     </div>
   );
 };

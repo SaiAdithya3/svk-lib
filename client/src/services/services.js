@@ -59,3 +59,32 @@ export const searchStudentById = async (studentId) => {
         throw error;
     }
 };
+
+export const fetchAllLoans = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/loan/all-loans`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+  
+      if (!Array.isArray(data.loans)) {
+        throw new Error('Expected data.loans to be an array');
+      }
+  
+      return data.loans; 
+    } catch (error) {
+      console.error('Error fetching all loans:', error);
+      throw error;
+    }
+  };
+  
+export const unreturnedBooks1 = async () => {
+    try {
+        const response = await axios.get(`${BASE_URL}/loan/unreturned-books`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching unreturned books:', error);
+        throw error;
+    }
+};

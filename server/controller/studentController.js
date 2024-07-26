@@ -34,7 +34,7 @@ export const searchStudentsWithId = async (req, res) => {
     return res.status(400).json({ error: "Student ID is required" });
   }
   try {
-    const student = await Student.findOne({ student });
+    const student = await Student.findOne({ studentId });
     if (!student) {
       return res.status(404).json({ error: "Student not found" });
     }

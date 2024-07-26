@@ -2,14 +2,15 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Disc2, LoaderPinwheel, Search } from "lucide-react";
 import { toast } from "sonner";
+import BorrowBookModal from "../components/BorrowBookModal";
 import BookModal from "../components/BookModal";
-import { borrowBooks, searchBooks } from "../services/services";
+import { borrowBooks, searchBooks, searchStudentById } from "../services/services";
 
 const BorrowBooks = () => {
   const [searchText, setSearchText] = useState("");
   const [books, setBooks] = useState([]);
   const [selectedBooks, setSelectedBooks] = useState([]);
-  const [studentDetails, setStudentDetails] = useState({ id: "" });
+  const [studentDetails, setStudentDetails] = useState({ id: "", name: "" });
   const [isBorrowing, setIsBorrowing] = useState(false);
   const [viewBook, setViewBook] = useState(null);
   const [debounceTimeout, setDebounceTimeout] = useState(null);
@@ -44,6 +45,19 @@ const BorrowBooks = () => {
     );
   };
 
+  const handleStudentSearch = async (id) => {
+    try {
+      const response = await searchStudentById(id);
+      // console.log(response.student._id);
+      // console.log(selectedBooks);
+      setStudentDetails({ id: response.student._id, name: response.student.name });
+      toast.success(`Student found: ${response.student.name}`);
+    } catch (error) {
+      console.error("Error fetching student:", error);
+      toast.error("Student not found");
+    }
+  };
+
   const handleBorrow = () => {
     if (selectedBooks.length === 0) {
       toast.error("Please select at least one book to borrow.");
@@ -57,16 +71,22 @@ const BorrowBooks = () => {
   };
 
   const handleConfirmBorrow = async () => {
-    // setSelectedBooks([]);
-    // setStudentDetails({ name: "", id: "" });
     setIsBorrowing(false);
-    await borrowBooks(
-      studentDetails.id,
-      selectedBooks.map((book) => book.bookid)
-    );
-    toast.success(
-      `Books borrowed by ${studentDetails.name} (ID: ${studentDetails.id})`
-    );
+    // console.log(studentDetails.id, selectedBooks.map((book) => book.bookid));
+    try {
+      await borrowBooks(
+        studentDetails.id,
+        selectedBooks.map((book) => book._id)
+      );
+      toast.success(
+        `Books borrowed by ${studentDetails.name} (ID: ${studentDetails.id})`
+      );
+      setSelectedBooks([]);
+      setStudentDetails({ id: "", name: "" });
+    } catch (error) {
+      console.error("Error borrowing books:", error);
+      toast.error("Failed to borrow books.");
+    }
   };
 
   const handleSelectBook = (book) => {
@@ -152,9 +172,8 @@ const BorrowBooks = () => {
               {books.map((book, index) => (
                 <tr
                   key={index}
-                  className={`hover:bg-gray-50 popp cursor-pointer ${
-                    selectedBooks.includes(book) ? "bg-gray-200" : ""
-                  }`}
+                  className={`hover:bg-gray-50 popp cursor-pointer ${selectedBooks.includes(book) ? "bg-gray-200" : ""
+                    }`}
                   onClick={() => handleSelectBook(book)}
                 >
                   <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">
@@ -198,49 +217,13 @@ const BorrowBooks = () => {
       )}
 
       {isBorrowing && (
-        <div className="fixed z-50 inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
-          <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all max-w-md w-full">
-            <div className="bg-gray-100 px-4 py-3 flex justify-between items-center">
-              <h2 className="text-lg font-semibold text-gray-700">
-                Student Details
-              </h2>
-              <button
-                className="text-red-700 font-semibold bg-red-200 px-2 rounded-lg hover:text-red-800"
-                onClick={() => setIsBorrowing(false)}
-              >
-                Close
-              </button>
-            </div>
-            <div className="px-4 py-3 flex flex-col gap-2">
-              <input
-                type="text"
-                className="px-4 py-2 popp border font border-gray-300 rounded-lg"
-                placeholder="Student ID"
-                value={studentDetails.id}
-                onChange={(e) =>
-                  setStudentDetails({ ...studentDetails, id: e.target.value })
-                }
-              />
-              <div className="w-full flex flex-col">
-                <h1 className="text-md font-semibold px-2 py-2">
-                  Review books
-                </h1>
-                {selectedBooks &&
-                  selectedBooks.map((book) => (
-                    <p className="px-2 py-1 popp" key={book.isbn}>
-                      &rArr; {book.title} ({book.author})
-                    </p>
-                  ))}
-              </div>
-              <button
-                className="mt-4 px-4 py-2 bg-zinc-800 shadow text-white rounded-lg"
-                onClick={handleConfirmBorrow}
-              >
-                Confirm Borrow
-              </button>
-            </div>
-          </div>
-        </div>
+        <BorrowBookModal
+          studentDetails={studentDetails}
+          selectedBooks={selectedBooks}
+          onClose={() => setIsBorrowing(false)}
+          onConfirm={handleConfirmBorrow}
+          onStudentSearch={handleStudentSearch}
+        />
       )}
 
       {viewBook && (
