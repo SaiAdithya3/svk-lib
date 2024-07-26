@@ -29,12 +29,22 @@ export const getBooks = async () => {
 }
 export const searchBooks = async (query) => {
     try {
-      const response = await axios.get(`${BASE_URL}/book/searchbook`, {
-        params: { query },
-      });
-      return response.data;
+        const response = await axios.get(`${BASE_URL}/book/searchbook`, {
+            params: { query },
+        });
+        return response.data;
     } catch (error) {
-      console.error('Error fetching books:', error);
-      throw error;
+        console.error('Error fetching books:', error);
+        throw error;
     }
-  };
+};
+
+export const borrowBooks = async (studentId, bookIds) => {
+    try {
+        const response = await axios.post(`${BASE_URL}/loan/add-loan`, { studentId, bookIds });
+        return response.data;
+    } catch (error) {
+        console.error('Error borrowing books:', error);
+        throw error;
+    }
+};

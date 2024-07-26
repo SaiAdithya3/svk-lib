@@ -7,6 +7,7 @@ const app = express();
 import authRoutes from "./routes/authRoutes.js";
 import loanRoutes from "./routes/loanRoutes.js";
 import bookRoutes from "./routes/bookRoutes.js";
+import studentRoutes from "./routes/studentRoutes.js";
 
 app.use(cors(
   {
@@ -24,6 +25,7 @@ app.get("/", (req, res) => {
 });
 app.use("/auth", authRoutes);
 app.use("/loan", loanRoutes);
+app.use("/student", studentRoutes);
 app.use("/book", bookRoutes);
 
 app.listen(3000, () => {
