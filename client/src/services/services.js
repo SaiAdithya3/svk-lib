@@ -48,3 +48,14 @@ export const borrowBooks = async (studentId, bookIds) => {
         throw error;
     }
 };
+
+
+export const searchStudentById = async (studentId) => {
+    try {
+        const response = await axios.get(`${BASE_URL}/student/${studentId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching student:', error);
+        throw error;
+    }
+};
