@@ -214,7 +214,7 @@ export const unreturnedBooks =  async (req, res) => {
     const unreturnedLoans = await loanSchema.find({})
     .populate({
       path: 'studentId', 
-      select: 'name id'
+      select: 'name studentId'
     })
     .populate({
       path: 'bookId',
