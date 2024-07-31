@@ -6,14 +6,21 @@ import { useLocation } from 'react-router-dom';
 const Navbar = () => {
   const location = useLocation();
   const path = location.pathname.split('/').filter((x) => x);
-
+  const breadCrumbPath = path.map((path) => {
+    return path.replace(/^./, char => char.toUpperCase())
+  })
+  
   return (
     <>
       <div className="navbar sticky top-0 border-b bg-white/60 backdrop-blur-sm border-zinc-200">
         <div className="navbar-start flex text-sm font-semibold px-5 breadcrumbs">
             <ul>
-              <li><a>Dashboard</a></li>
-              <li><a>{path}</a></li>
+              <li>
+                <Link to='/'>Dashboard</Link>
+                </li>
+              <li>
+                <a>{breadCrumbPath}</a>
+                </li>
             </ul>
         </div>
         <div className="navbar-center">
