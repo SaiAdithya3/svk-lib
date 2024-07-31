@@ -3,36 +3,25 @@ import Book from '../schemas/bookSchema.js';
 export const addBook = async (req, res) => {
   const {
     title,
-    bookid,
     isbn,
     author,
     genre,
     category,
-    totalCopies,
-    availableCopies,
+    copies,
     location,
   } = req.body;
-  console.log(req.body);
 
-  if (!title || !bookid || !totalCopies) {
-    return res.status(400).json({ error: 'All fields are required' });
-  }
-
-
-  const existingBook = await Book.findOne({ bookid });
-  if (existingBook) {
-    return res.status(400).json({ error: 'Book with this ID already exists' });
+  if (!title || !copies || copies.length === 0) {
+    return res.status(400).json({ error: 'Title and at least one copy are required' });
   }
 
   const newBook = new Book({
     title,
-    bookid,
     isbn,
     author,
     genre,
     category,
-    totalCopies,
-    availableCopies,
+    copies,
     location,
   });
 
@@ -43,6 +32,7 @@ export const addBook = async (req, res) => {
     res.status(500).json({ error: 'Error adding the book', details: error.message });
   }
 };
+
 
 export const getBooks = async (req, res) => {
   const { page = 1, search = '' } = req.query;
