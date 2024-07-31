@@ -41,7 +41,7 @@ const BorrowBooks = () => {
     setDebounceTimeout(
       setTimeout(() => {
         fetchBooks(query);
-      }, 2000)
+      }, 1500)
     );
   };
 
@@ -196,7 +196,7 @@ const BorrowBooks = () => {
                     {book.author}
                   </td>
                   <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">
-                    {book.availableCount} / {book.totalCount}
+                    {book.availableCopies} / {book.totalCopies}
                   </td>
                   <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">
                     <button
