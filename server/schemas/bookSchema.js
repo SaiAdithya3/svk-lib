@@ -7,7 +7,7 @@ const copySchema = new mongoose.Schema({
 
 const bookSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  isbn: { type: String },
+  isbn: { type: String, unique: true },
   author: { type: String },
   genre: { type: String },
   category: { type: String },

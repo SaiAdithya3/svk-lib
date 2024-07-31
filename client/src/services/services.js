@@ -8,12 +8,39 @@ export const addBook = async (book) => {
         return;
     }
     try {
+        // const response = await axios.post(`${BASE_URL}/book/addbook`, book, { headers: { 'Content-Type': 'application/json' } });
         const response = await axios.post(`${BASE_URL}/book/addbook`, book);
         toast.success('Book added successfully');
         return response;
     } catch (error) {
-        toast.error('An error occurred');
-        console.error(error);
+        toast.error(error.response.data.error || 'An error occurred');
+        console.log(error.response.data.error);
+    }
+}
+
+export const updateBook = async (book) => {
+    if (!book.isbn) {
+        toast.error('ISBN is required');
+        return;
+    }
+    try {
+        const response = await axios.post(`${BASE_URL}/book/updatebook`, book);
+        toast.success('Book updated successfully');
+        return response.data;
+    } catch (error) {
+        toast.error(error.response?.data?.error || 'An error occurred');
+        console.error(error.response?.data?.error || error.message);
+    }
+};
+
+
+export const isBookExists = async (isbn) => {
+    try {
+        const response = await axios.get(`${BASE_URL}/book/isBookExists?isbn=${isbn}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error checking if book exists:', error);
+        // throw error;
     }
 }
 
