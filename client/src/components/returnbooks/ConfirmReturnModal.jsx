@@ -2,7 +2,7 @@ import React from 'react';
 
 const ConfirmReturnModal = ({ book, onConfirm, onCancel }) => {
   return (
-    <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 bg-gray-800 bg-opacity-50 flex items-center justify-center">
       <div className="bg-white rounded-lg shadow-lg p-6">
         <h2 className="text-xl font-semibold mb-4">Confirm Return</h2>
         <p>Are you sure you want to return this book?</p>

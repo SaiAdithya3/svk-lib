@@ -4,6 +4,7 @@ import { fetchAllLoans } from '../services/services';
 const ActivityLog = () => {
   const [bookLoans, setBookLoans] = useState([]);
   const [searchText, setSearchText] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchBookLoans = async () => {
@@ -30,6 +31,8 @@ const ActivityLog = () => {
         setBookLoans(formattedLogs);
       } catch (error) {
         console.error('Error fetching book loans:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -65,7 +68,11 @@ const ActivityLog = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredLogs.length > 0 ? (
+            {loading ? (
+              <tr>
+                <td colSpan="3" className="px-4 py-4 text-center text-gray-700">Loading...</td>
+              </tr>
+            ) : filteredLogs.length > 0 ? (
               filteredLogs.map(log => (
                 <tr key={log.id} className="hover:bg-gray-50 popp">
                   <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{log.date}</td>

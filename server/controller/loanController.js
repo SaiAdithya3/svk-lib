@@ -68,9 +68,12 @@ export const addLoan = async (req, res) => {
     });
     await loan.save();
 
+    const bookNames = books.map(book => book.title);
+
+
     // Generate QR code and send email
     const qrCode = await generateQRCode(loan._id);
-    const emailSent = await sendEmail(student.email, student.name, qrCode);
+    const emailSent = await sendEmail(student.email, student.name, qrCode , bookNames);
 
     if (!emailSent) {
       return res.status(500).json({ message: "Error sending email" });
