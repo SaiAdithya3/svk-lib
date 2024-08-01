@@ -1,62 +1,75 @@
 import mongoose from "mongoose";
-import bookSchema from "../schemas/bookSchema.js";
-import loanSchema from "../schemas/loanSchema.js";
-import studentSchema from "../schemas/studentSchema.js";
+import Book from "../schemas/bookSchema.js";
+import Loan from "../schemas/loanSchema.js";
+import Student from "../schemas/studentSchema.js"; // Ensure this is defined correctly
 import { generateQRCode } from "../utils/qrCodeHelper.js";
 import { sendEmail } from "../utils/emailHelper.js";
 
 export const addLoan = async (req, res) => {
-  const { studentId, bookIds } = req.body;
+  const { studentId, bookCopyCodes } = req.body;
 
   // Validate ObjectIds
   if (!mongoose.Types.ObjectId.isValid(studentId)) {
     return res.status(400).json({ message: "Invalid student ID" });
   }
 
-  if (!bookIds.every(id => mongoose.Types.ObjectId.isValid(id))) {
-    return res.status(400).json({ message: "One or more book IDs are invalid" });
+  // Validate bookCopyCodes
+  if (!Array.isArray(bookCopyCodes) || !bookCopyCodes.every(code => typeof code === 'string')) {
+    return res.status(400).json({ message: "Invalid book copy codes" });
   }
 
   try {
     // Check if student exists
-    const student = await studentSchema.findById(studentId);
+    const student = await Student.findById(studentId);
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
     }
 
-    // Find the books
-    const books = await bookSchema.find({ _id: { $in: bookIds } });
-    if (books.length !== bookIds.length) {
-      return res.status(404).json({ message: "Some books not found" });
+    // Find books with the given copy codes
+    const books = await Book.find({ "copies.code": { $in: bookCopyCodes } });
+
+    // Validate that all provided copy codes were found
+    const foundCopyCodes = books.flatMap(book => book.copies.map(copy => copy.code));
+    const missingCopyCodes = bookCopyCodes.filter(code => !foundCopyCodes.includes(code));
+    if (missingCopyCodes.length > 0) {
+      return res.status(404).json({ message: "Some book copies not found", missingCopyCodes });
     }
 
-    // Check book availability
-    const insufficientBooks = books.filter((book) => book.availableCopies < 1);
-    if (insufficientBooks.length > 0) {
-      return res.status(400).json({
-        message: "Some books are not available in the required quantity",
-        insufficientBooks: insufficientBooks.map((book) => book.title),
+    // Check availability of each copy code
+    const unavailableCopies = [];
+    books.forEach(book => {
+      book.copies.forEach(copy => {
+        if (bookCopyCodes.includes(copy.code) && copy.status !== 'available') {
+          unavailableCopies.push(copy.code);
+        }
       });
+    });
+    if (unavailableCopies.length > 0) {
+      return res.status(400).json({ message: "Some book copies are not available", unavailableCopies });
     }
 
-    // Update book availability
+    // Update the status of each copy to 'borrowed'
     await Promise.all(
       books.map(async (book) => {
-        book.availableCopies -= 1;
+        book.copies.forEach(copy => {
+          if (bookCopyCodes.includes(copy.code)) {
+            copy.status = 'borrowed';
+          }
+        });
         await book.save();
       })
     );
 
     // Create a new loan
-    const loan = new loanSchema({
-      studentId, // Directly use the studentId
-      bookId: bookIds, // Directly use the bookIds
+    const loan = new Loan({
+      studentId,
+      bookCopyCodes,
       status: "borrowed",
     });
     await loan.save();
 
     // Generate QR code and send email
-    const qrCode = await generateQRCode({ loanId: loan._id });
+    const qrCode = await generateQRCode(loan._id);
     const emailSent = await sendEmail(student.email, student.name, qrCode);
 
     if (!emailSent) {
@@ -70,8 +83,6 @@ export const addLoan = async (req, res) => {
   }
 };
 
-
-// Return a loan
 export const returnLoan = async (req, res) => {
   const { loanId } = req.body;
 
@@ -80,7 +91,7 @@ export const returnLoan = async (req, res) => {
   }
 
   try {
-    const loan = await loanSchema.findById(loanId);
+    const loan = await Loan.findById(loanId);
     if (!loan) {
       return res.status(404).json({ message: "Loan not found" });
     }
@@ -93,14 +104,15 @@ export const returnLoan = async (req, res) => {
     loan.returned = new Date();
     await loan.save();
 
-    const bulkOps = loan.bookId.map((bookId) => ({
+    // Update the status of each book copy to 'available'
+    const bulkOps = loan.bookCopyCodes.map((code) => ({
       updateOne: {
-        filter: { _id: bookId },
-        update: { $inc: { availableCopies: 1 } },
+        filter: { "copies.code": code },
+        update: { $set: { "copies.$.status": 'available' } },
       },
     }));
 
-    await bookSchema.bulkWrite(bulkOps);
+    await Book.bulkWrite(bulkOps);
 
     res.status(200).json({ message: "Books successfully returned" });
   } catch (error) {
@@ -109,17 +121,15 @@ export const returnLoan = async (req, res) => {
   }
 };
 
-// Get overdue loans
-const OVERDUE_DAYS = process.env.OVERDUE_DAYS || 7;
 
 export const overdue = async (req, res) => {
+  const OVERDUE_DAYS = process.env.OVERDUE_DAYS || 7;
+
   try {
     const currentDate = new Date();
-    const overdueLoans = await loanSchema.find({
+    const overdueLoans = await Loan.find({
       returned: { $exists: false },
-      date: {
-        $lt: new Date(currentDate.setDate(currentDate.getDate() - OVERDUE_DAYS)),
-      },
+      date: { $lt: new Date(currentDate.setDate(currentDate.getDate() - OVERDUE_DAYS)) },
     });
 
     res.status(200).json(overdueLoans);
@@ -129,7 +139,6 @@ export const overdue = async (req, res) => {
   }
 };
 
-// Get overdue loans for a specific student
 export const studentOverdue = async (req, res) => {
   const { studentId } = req.body;
 
@@ -139,12 +148,10 @@ export const studentOverdue = async (req, res) => {
 
   try {
     const currentDate = new Date();
-    const overdueLoans = await loanSchema.find({
+    const overdueLoans = await Loan.find({
       studentId,
       returned: { $exists: false },
-      date: {
-        $lt: new Date(currentDate.setDate(currentDate.getDate() - OVERDUE_DAYS)),
-      },
+      date: { $lt: new Date(currentDate.setDate(currentDate.getDate() - OVERDUE_DAYS)) },
     });
 
     res.status(200).json(overdueLoans);
@@ -154,28 +161,23 @@ export const studentOverdue = async (req, res) => {
   }
 };
 
-
 export const getBookLoans = async (req, res) => {
   const { bookId } = req.params;
-  if (!bookId) {
-    return res.status(400).json({ message: "Invalid data" });
+  if (!bookId || !mongoose.Types.ObjectId.isValid(bookId)) {
+    return res.status(400).json({ message: "Invalid book ID" });
   }
 
   try {
-    const bookLoans = await loanSchema
-      .find({
-        bookId,
-        returned: { $exists: false },
-      })
-      .populate({
-        path: "studentId",
-        select: "name email",
-      });
+    const bookLoans = await Loan.find({
+      bookCopyCodes: bookId, // Use `bookCopyCodes` instead of `bookId`
+      returned: { $exists: false },
+    }).populate({
+      path: "studentId",
+      select: "name email",
+    });
 
     if (!bookLoans.length) {
-      return res
-        .status(404)
-        .json({ message: "No active loans found for this book" });
+      return res.status(404).json({ message: "No active loans found for this book" });
     }
 
     return res.status(200).json(bookLoans);
@@ -188,13 +190,13 @@ export const getBookLoans = async (req, res) => {
 
 export const getAllLoans = async (req, res) => {
   try {
-    const loans = await loanSchema.find({})
+    const loans = await Loan.find({})
       .populate({
         path: 'studentId',
-        select: 'name email' // Adjust the fields to match your schema
+        select: 'name email'
       })
       .populate({
-        path: 'bookId', // Adjust this to match your schema
+        path: 'bookCopyCodes', // Use `bookCopyCodes` instead of `bookId`
         select: 'title author isbn'
       });
 
@@ -208,28 +210,51 @@ export const getAllLoans = async (req, res) => {
   }
 };
 
-export const unreturnedBooks =  async (req, res) => {
+export const getLoanById = async (req, res) => {
+  const { id } = req.params;
+
+  if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid loan ID" });
+  }
+
   try {
-    // Fetch loans where returnDate is null
-    const unreturnedLoans = await loanSchema.find({})
+    const loan = await Loan.findById(id)
+      .populate({
+        path: 'studentId',
+        select: 'name email'
+      })
+      .populate({
+        path: 'bookCopyCodes', // Use `bookCopyCodes` instead of `bookId`
+        select: 'title author isbn'
+      });
+
+    if (!loan) {
+      return res.status(404).json({ message: "Loan not found" });
+    }
+
+    return res.status(200).json(loan);
+  }
+
+  catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+
+export const unreturnedBooks = async (req, res) => {
+  try {
+    const unreturnedLoans = await Loan.find({
+      returned: { $exists: false }
+    })
     .populate({
-      path: 'studentId', 
+      path: 'studentId',
       select: 'name studentId'
     })
     .populate({
-      path: 'bookId',
-      select: 'title author isbn'
+      path: 'bookCopyCodes', // Use `bookCopyCodes` instead of `bookId`
+      select: 'title author isbn bookCopyCodes status'
     });
-    // console.log(unreturnedLoans[1].bookId);
-    // Format response
-    const unreturnedBooks = unreturnedLoans.map(loan => ({
-      serialNumber: loan._id, 
-      // isbn: loan.book.isbn,
-      // title: loan.book.title,
-      // author: loan.book.author,
-      // borrower: loan.borrower,
-      // borrowDate: loan.borrowDate.toISOString().split('T')[0], // Format date
-    }));
 
     res.json(unreturnedLoans);
   } catch (error) {

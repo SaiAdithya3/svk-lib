@@ -13,8 +13,8 @@ export const addBook = async (book) => {
         toast.success('Book added successfully');
         return response;
     } catch (error) {
-        toast.error(error.response.data.error || 'An error occurred');
-        console.log(error.response.data.error);
+        console.error('Error adding book:', error);
+        throw error;
     }
 }
 
@@ -28,8 +28,8 @@ export const updateBook = async (book) => {
         toast.success('Book updated successfully');
         return response.data;
     } catch (error) {
-        toast.error(error.response?.data?.error || 'An error occurred');
-        console.error(error.response?.data?.error || error.message);
+        console.error('Error updating book:', error);
+        throw error;
     }
 };
 
@@ -40,7 +40,7 @@ export const isBookExists = async (isbn) => {
         return response.data;
     } catch (error) {
         console.error('Error checking if book exists:', error);
-        // throw error;
+        throw error;
     }
 }
 
@@ -50,8 +50,8 @@ export const getBooks = async () => {
         const response = await axios.get(`${BASE_URL}/book/getbooks`);
         return response.data;
     } catch (error) {
-        toast.error('An error occurred');
-        console.error(error);
+        console.error('Error fetching books:', error);
+        throw error;
     }
 }
 export const searchBooks = async (query) => {
@@ -66,9 +66,9 @@ export const searchBooks = async (query) => {
     }
 };
 
-export const borrowBooks = async (studentId, bookIds) => {
+export const borrowBooks = async (studentId, bookIds, bookCopyCodes) => {
     try {
-        const response = await axios.post(`${BASE_URL}/loan/add-loan`, { studentId, bookIds });
+        const response = await axios.post(`${BASE_URL}/loan/add-loan`, { studentId, bookIds, bookCopyCodes });
         return response.data;
     } catch (error) {
         console.error('Error borrowing books:', error);
@@ -115,3 +115,13 @@ export const unreturnedBooks1 = async () => {
         throw error;
     }
 };
+
+export const returnBook = async (loanId) => {
+    try {
+        const response = await axios.post(`${BASE_URL}/loan/return-loan`, { loanId });
+        return response.data;
+    } catch (error) {
+        console.error('Error returning book:', error);
+        throw error;
+    }
+}

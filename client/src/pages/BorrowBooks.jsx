@@ -4,6 +4,7 @@ import { Disc2, LoaderPinwheel, Search } from "lucide-react";
 import { toast } from "sonner";
 import BorrowBookModal from "../components/BorrowBookModal";
 import BookModal from "../components/BookModal";
+import CodeSelectionModal from "../components/CodeSelectionModal";
 import { borrowBooks, searchBooks, searchStudentById } from "../services/services";
 
 const BorrowBooks = () => {
@@ -13,6 +14,7 @@ const BorrowBooks = () => {
   const [studentDetails, setStudentDetails] = useState({ id: "", name: "" });
   const [isBorrowing, setIsBorrowing] = useState(false);
   const [viewBook, setViewBook] = useState(null);
+  const [codeSelectionBook, setCodeSelectionBook] = useState(null);
   const [debounceTimeout, setDebounceTimeout] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -48,8 +50,6 @@ const BorrowBooks = () => {
   const handleStudentSearch = async (id) => {
     try {
       const response = await searchStudentById(id);
-      // console.log(response.student._id);
-      // console.log(selectedBooks);
       setStudentDetails({ id: response.student._id, name: response.student.name });
       toast.success(`Student found: ${response.student.name}`);
     } catch (error) {
@@ -72,11 +72,11 @@ const BorrowBooks = () => {
 
   const handleConfirmBorrow = async () => {
     setIsBorrowing(false);
-    // console.log(studentDetails.id, selectedBooks.map((book) => book.bookid));
     try {
       await borrowBooks(
         studentDetails.id,
-        selectedBooks.map((book) => book._id)
+        selectedBooks.map((book) => book._id),
+        selectedBooks.map((book) => book.code)
       );
       toast.success(
         `Books borrowed by ${studentDetails.name} (ID: ${studentDetails.id})`
@@ -85,21 +85,40 @@ const BorrowBooks = () => {
       setStudentDetails({ id: "", name: "" });
     } catch (error) {
       console.error("Error borrowing books:", error);
-      toast.error("Failed to borrow books.");
+      toast.error(error.response?.data?.message || "Failed to borrow books");
     }
   };
 
-  const handleSelectBook = (book) => {
-    if (selectedBooks.includes(book)) {
-      setSelectedBooks(selectedBooks.filter((b) => b !== book));
-    } else {
-      if (selectedBooks.length < 5) {
-        setSelectedBooks([...selectedBooks, book]);
-      } else {
-        toast.error("You can only select up to 5 books.");
-      }
-    }
+  const handleClick = (book) => {
+    setCodeSelectionBook(book);
   };
+
+  const handleSelectBook = (code) => {
+    const book = codeSelectionBook;
+  
+    // Check if the book with the same ISBN already exists in selectedBooks
+    const existingBookIndex = selectedBooks.findIndex(b => b.isbn === book.isbn);
+  
+    if (existingBookIndex !== -1) {
+      // Replace the existing book with the new code
+      const updatedBooks = [...selectedBooks];
+      updatedBooks[existingBookIndex] = {
+        ...book,
+        code,
+      };
+      setSelectedBooks(updatedBooks);
+    } else {
+      // Add the new book to the list
+      const newBook = {
+        ...book,
+        code,
+      };
+      setSelectedBooks([...selectedBooks, newBook]);
+    }
+  
+    setCodeSelectionBook(null);
+  };
+  
 
   const handleRemoveBook = (book) => {
     setSelectedBooks(selectedBooks.filter((b) => b !== book));
@@ -172,15 +191,15 @@ const BorrowBooks = () => {
               {books.map((book, index) => (
                 <tr
                   key={index}
-                  className={`hover:bg-gray-50 popp cursor-pointer ${selectedBooks.includes(book) ? "bg-gray-200" : ""
+                  className={`hover:bg-gray-50 popp cursor-pointer ${selectedBooks.some(b => b._id === book._id) ? "bg-gray-200" : ""
                     }`}
-                  onClick={() => handleSelectBook(book)}
+                  onClick={() => handleClick(book)}
                 >
                   <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">
                     <input
                       type="checkbox"
-                      checked={selectedBooks.includes(book)}
-                      onChange={() => handleSelectBook(book)}
+                      checked={selectedBooks.some(b => b._id === book._id)}
+                      onChange={() => handleClick(book)}
                     />
                   </td>
                   <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">
@@ -216,46 +235,57 @@ const BorrowBooks = () => {
         </div>
       )}
 
-      {isBorrowing && (
-        <BorrowBookModal
-          studentDetails={studentDetails}
-          selectedBooks={selectedBooks}
-          onClose={() => setIsBorrowing(false)}
-          onConfirm={handleConfirmBorrow}
-          onStudentSearch={handleStudentSearch}
+      {viewBook && (
+        <BookModal
+          book={viewBook}
+          onClose={() => setViewBook(null)}
         />
       )}
 
-      {viewBook && (
-        <BookModal book={viewBook} onClose={() => setViewBook(null)} />
+      {codeSelectionBook && (
+        <CodeSelectionModal
+          book={codeSelectionBook}
+          onSelectCode={handleSelectBook}
+          onClose={() => setCodeSelectionBook(null)}
+        />
       )}
 
-      {/* Floating Card */}
-      <div className="fixed bottom-4 right-4 bg-white border z-0 border-gray-200 shadow-lg rounded-lg p-4 ">
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">
-          Selected Books
-        </h3>
-        {selectedBooks.length === 0 ? (
-          <p className="text-gray-600">No books selected.</p>
-        ) : (
-          <ul className="list-disc list-inside space-y-1 text-gray-700">
+      {isBorrowing && (
+        <BorrowBookModal
+        studentDetails={studentDetails}
+        selectedBooks={selectedBooks}
+        onClose={() => setIsBorrowing(false)}
+        onConfirm={handleConfirmBorrow}
+        onStudentSearch={handleStudentSearch}
+      />
+      )}
+
+      {selectedBooks.length > 0 && (
+        <div className="fixed bottom-6 right-6 bg-white shadow-lg rounded-lg border border-gray-200 p-4 max-w-xl">
+          <h3 className="text-lg font-semibold mb-2">Selected Books</h3>
+          <ul>
             {selectedBooks.map((book) => (
-              <li
-                key={book.isbn}
-                className="border-b py-1 text-sm flex justify-between items-center"
-              >
-                {book.title} ({book.author})
-                <button
-                  className="ml-2 px-2 py-1 bg-red-600 text-white rounded-lg text-xs"
-                  onClick={() => handleRemoveBook(book)}
-                >
-                  Remove
-                </button>
+              <li key={book._id} className="flex items-center justify-between py-2 border-b border-gray-200">
+                <span>{book.title}</span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    className="border border-gray-300 rounded-lg p-1"
+                    value={book.code || ""}
+                    readOnly
+                  />
+                  <button
+                    className="text-red-600"
+                    onClick={() => handleRemoveBook(book)}
+                  >
+                    Remove
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

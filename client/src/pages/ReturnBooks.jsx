@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Disc2, Search } from 'lucide-react';
-import { unreturnedBooks1 } from '../services/services';
+import { unreturnedBooks1, returnBook } from '../services/services';
 import QrReader from 'modern-react-qr-reader';
 
 const ReturnBooks = () => {
@@ -19,33 +19,38 @@ const ReturnBooks = () => {
     setIsReturning(true);
   };
 
-  useEffect(() => {
-    const fetchUnreturnedBooks = async () => {
-      try {
-        const books = await unreturnedBooks1();
-        setUnreturnedBooks(books);
-      } catch (error) {
-        console.error('Error fetching unreturned books:', error);
-        toast.error('An error occurred while fetching unreturned books.');
-      }
-    };
+  const fetchUnreturnedBooks = async () => {
+    try {
+      const books = await unreturnedBooks1();
+      setUnreturnedBooks(books);
+    } catch (error) {
+      console.error('Error fetching unreturned books:', error);
+      toast.error('An error occurred while fetching unreturned books.');
+    }
+  };
 
+  useEffect(() => {
     fetchUnreturnedBooks();
   }, []);
 
-  const handleConfirmReturn = () => {
+  const handleConfirmReturn = async () => {
     if (!selectedBook) return;
 
     // Here you would typically call an API to update the return status
-    toast.success(`Book returned: ${selectedBook.title}`);
-    setUnreturnedBooks(unreturnedBooks.filter(book => book !== selectedBook));
-    setSelectedBook(null);
     setIsReturning(false);
+    try {
+      const response = await returnBook(selectedBook._id);
+      toast.success(response.message);
+      fetchUnreturnedBooks();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to borrow books");
+    }
   };
 
   const handleQRScan = (data) => {
     if (data) {
-      const book = unreturnedBooks.find(book => book.isbn === data);
+      const book = unreturnedBooks.find(book => book._id == data);
+      console.log(unreturnedBooks);
       if (book) {
         setSelectedBook(book);
         toast.success(`Book found: ${book.title}`);
@@ -57,6 +62,14 @@ const ReturnBooks = () => {
   };
   // console.log(unreturnedBooks);
 
+  const handleSelectBook = (book) => {
+    if (selectedBook === book) {
+      setSelectedBook(null);
+    } else {
+      setSelectedBook(book);
+    }
+  };
+
   const handleQRScanError = (error) => {
     console.error(error);
     toast.error("Error scanning QR code. Please try again.");
@@ -64,11 +77,14 @@ const ReturnBooks = () => {
   };
 
   const calculateStatus = (borrowDate) => {
-    const dueDate = new Date(borrowDate);
-    dueDate.setDate(dueDate.getDate() + 14);
-    const currentDate = new Date();
+    const borrowDateObj = new Date(borrowDate);
+    const dueDate = new Date(borrowDateObj);
+    // dueDate.setDate(dueDate.getDate() + 14);
+    dueDate.setHours(dueDate.getHours() + 12); 
+    const currentDate = new Date();  
     return currentDate > dueDate ? 'Overdue' : 'Before Due';
   };
+  
 
   const filteredBooks = unreturnedBooks.filter(book => {
     const title = book?.title?.toLowerCase() || '';
@@ -136,25 +152,25 @@ const ReturnBooks = () => {
                 <tr
                   key={index}
                   className={`hover:bg-gray-50 popp cursor-pointer ${selectedBook === book ? 'bg-gray-200' : ''}`}
-                  onClick={() => setSelectedBook(book)}
+                  onClick={() => handleSelectBook(book)}
                 >
                   <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">
                     <input
                       type="checkbox"
                       checked={selectedBook === book}
-                      onChange={() => setSelectedBook(book)}
+                      onChange={() => handleSelectBook(book)}
                     />
                   </td>
-                  <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{index + 1}</td>
-                  <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.isbn}</td>
-                  <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">
+                  <td className="px-4 py-4 border-b truncate border-gray-200 text-sm text-gray-700">{index + 1}</td>
+                  <td className="px-4 py-4 border-b truncate border-gray-200 text-sm text-gray-700">{book.isbn}</td>
+                  <td className="px-4 py-4 border-b truncate border-gray-200 text-sm text-gray-700">
                    {book.bookId && book.bookId[0].title}
                   </td>
-                  <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.studentId && book.studentId.name} (ID: {book.studentId && book.studentId.studentId})</td>
-                  <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{new Date(book.date).toLocaleDateString()}</td>
-                  <td className="px-4 py-4 border-b border-gray-200 text-xs text-gray-700">
-                    <span className={`border w-full rounded-full py-1 ${calculateStatus(book.borrowDate) === 'Overdue' ? 'border-red-500 px-4 bg-red-200 text-red-800' : 'border-green-500 bg-green-200 px-3 text-green-800'}`}>
-                      {calculateStatus(book.borrowDate)}
+                  <td className="px-4 py-4 border-b truncate border-gray-200 text-sm text-gray-700">{book.studentId && book.studentId.name} (ID: {book.studentId && book.studentId.studentId})</td>
+                  <td className="px-4 py-4 border-b truncate border-gray-200 text-sm text-gray-700">{new Date(book.date).toLocaleDateString()}</td>
+                  <td className="px-4 py-4 border-b truncate border-gray-200 text-xs text-gray-700">
+                    <span className={`border w-full rounded-full py-1 ${calculateStatus(book.date) === 'Overdue' ? 'border-red-500 px-4 bg-red-200 text-red-800' : 'border-green-500 bg-green-200 px-3 text-green-800'}`}>
+                      {calculateStatus(book.date)}
                     </span>
                   </td>
                 </tr>
@@ -188,22 +204,25 @@ const ReturnBooks = () => {
       )}
 
       {showQRScanner && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-500 bg-opacity-75">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            {/* Uncomment QR code reader when integrated */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-75">
+        <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+          <h2 className="text-lg font-semibold mb-4 text-center">Scan QR Code</h2>
+          <div className="bg-gray-200 p-4 rounded-lg mb-4">
             <QrReader
               onScan={handleQRScan}
               onError={handleQRScanError}
               style={{ width: '100%' }}
+              
             />
-            <button
-              className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg"
-              onClick={() => setShowQRScanner(false)}
-            >
-              Close
-            </button>
           </div>
+          <button
+            className="w-full py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300"
+            onClick={() => setShowQRScanner(false)}
+          >
+            Close
+          </button>
         </div>
+      </div>
       )}
     </div>
   );
