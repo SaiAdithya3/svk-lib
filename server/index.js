@@ -24,7 +24,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.get('/', (req, res) => {
   res.send('Library Management System - Server');
 });
-app.use('/auth', authRoutes);
+app.use('/login', authRoutes);
+app.use('/validate',authRoutes)
 app.use('/loan', loanRoutes);
 app.use('/student', studentRoutes);
 app.use('/book', bookRoutes);

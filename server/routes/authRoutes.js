@@ -1,8 +1,13 @@
 import express from "express";
-import { login } from "../controller/authController.js";
+import { adminLogin ,studentLogin,validateAdminToken} from "../controller/authController.js";
 
 const authRoutes = express.Router();
 
-authRoutes.post("/login", login);
+authRoutes.post("/admin", adminLogin);
+
+authRoutes.post('/student',  studentLogin);
+
+authRoutes.get("/vadmin",validateAdminToken)
+
 
 export default authRoutes;

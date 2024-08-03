@@ -16,7 +16,6 @@ const NavItem = ({ to, icon: IconComponent, children, badge }) => {
       <Link
         to={to}
         className={`flex items-center p-2 space-x-3 rounded-lg hover:bg-gray-100 ${activeClass}`}
-        prefetch={false}
       >
         <Icon IconComponent={IconComponent} />
         <span>{children}</span>
@@ -45,7 +44,7 @@ const Sidebar = () => (
         </div>
         <nav className="p-4 space-y-4">
           <NavSection title="MAIN">
-            <NavItem to="/" icon={LayoutDashboardIcon}>
+            <NavItem to="/dashboard" icon={LayoutDashboardIcon}>
               Dashboard
             </NavItem>
             <NavItem to="/books" icon={Library}>

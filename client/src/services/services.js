@@ -1,38 +1,49 @@
 import axios from 'axios';
 import { toast } from 'sonner';
+import { getToken } from './getToken';
 const BASE_URL = 'http://localhost:3000';
 
-export const addBook = async (book) => {
+  
+  export const addBook = async (book) => {
     if (!book) {
-        toast.error('Book is required');
-        return;
+      toast.error('Book is required');
+      return;
     }
     try {
-        // const response = await axios.post(`${BASE_URL}/book/addbook`, book, { headers: { 'Content-Type': 'application/json' } });
-        const response = await axios.post(`${BASE_URL}/book/addbook`, book);
-        toast.success('Book added successfully');
-        return response;
+      const token = getToken();
+      console.log('Token:', token);
+      const response = await axios.post(`${BASE_URL}/book/addbook`, book, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      toast.success('Book added successfully');
+      return response;
     } catch (error) {
-        console.error('Error adding book:', error);
-        throw error;
+      console.error('Error adding book:', error);
+      throw error;
     }
-}
-
-export const updateBook = async (book) => {
+  }
+  
+  export const updateBook = async (book) => {
     if (!book.isbn) {
-        toast.error('ISBN is required');
-        return;
+      toast.error('ISBN is required');
+      return;
     }
     try {
-        const response = await axios.post(`${BASE_URL}/book/updatebook`, book);
-        toast.success('Book updated successfully');
-        return response.data;
+      const token = getToken();
+      const response = await axios.post(`${BASE_URL}/book/updatebook`, book, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      toast.success('Book updated successfully');
+      return response.data;
     } catch (error) {
-        console.error('Error updating book:', error);
-        throw error;
+      console.error('Error updating book:', error);
+      throw error;
     }
-};
-
+  };
 
 export const isBookExists = async (isbn) => {
     try {
@@ -68,7 +79,13 @@ export const searchBooks = async (query) => {
 
 export const borrowBooks = async (studentId, bookIds, bookCopyCodes) => {
     try {
-        const response = await axios.post(`${BASE_URL}/loan/add-loan`, { studentId, bookIds, bookCopyCodes });
+        const token = getToken();
+        
+        const response = await axios.post(`${BASE_URL}/loan/add-loan`, { studentId, bookIds, bookCopyCodes }, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
         return response.data;
     } catch (error) {
         console.error('Error borrowing books:', error);
@@ -118,7 +135,12 @@ export const unreturnedBooks1 = async () => {
 
 export const returnBook = async (loanId) => {
     try {
-        const response = await axios.post(`${BASE_URL}/loan/return-loan`, { loanId });
+        const token = getToken();
+        const response = await axios.post(`${BASE_URL}/loan/return-loan`, { loanId }, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
         return response.data;
     } catch (error) {
         console.error('Error returning book:', error);

@@ -9,12 +9,13 @@ import {
   unreturnedBooks,
   getLoanById,
 } from "../controller/loanController.js";
+import { validateAdminToken } from "../utils/middleWare.js";
 
 const router = express.Router();
 
-router.post("/add-loan", addLoan);
+router.post("/add-loan",validateAdminToken, addLoan);
 
-router.post("/return-loan", returnLoan);
+router.post("/return-loan",validateAdminToken, returnLoan);
 
 router.get("/overdue", overdue);
 
