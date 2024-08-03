@@ -23,6 +23,11 @@ const studentSchema = new mongoose.Schema({
   year: {
     type: String,
   },
+  dob: {
+    type: String, // Change type to String
+    required: true,
+  },
 });
 
-export default mongoose.model("student", studentSchema);
+export default mongoose.model("Student", studentSchema);
+

@@ -31,18 +31,47 @@ export const adminLogin = async (req, res) => {
   }
 };
 
-export const studentLogin = async (req, res) => {
-  const { email, password } = req.body;
+const formatDateString = (dateStr) => {
+  const [year, month, day] = dateStr.split('-');
+  return `${day}-${month}-${year}`;
+};
 
-  console.log('Student login request body:', req.body); // Ensure it logs { email: 'student@gmail.com', password: 'student' }
+// Student login function
+export const studentLogin = async (req, res) => {
+  const { email, password } = req.body; // Expecting email and password in request body
+
+  console.log('Student login request body:', req.body); // Log to ensure correct data
+
+  const dob = formatDateString(password); 
+  console.log('Formatted DOB:', dob); // Log formatted date of birth
 
   try {
-   
+    if (typeof email !== 'string' || typeof password !== 'string') {
+      return res.status(400).json({ message: 'Invalid input format' });
+    }
+
+    // Find the student by registration number (email in this case)
+    const student = await Student.findOne({ studentId: email });
+    if (!student) {
+      return res.status(404).json({ message: 'Student not found' });
+    }
+
+    // Convert input date string from 'dd-mm-yyyy' to 'yyyy-mm-dd' format
+    const inputDob = dob;
+    const studentDob = await student.dob;
+
+    // Check if the provided date of birth matches the stored one
+    if (inputDob!== studentDob) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    // Generate a JWT token for the student
+    const token = jwt.sign({ id: student._id, role: 'student' }, JWT_SECRET, { expiresIn: '1h' });
+    res.status(200).json({ token, student: { id: student._id, regNo: student.studentId } });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
-
 
 export const validateAdminToken = async (req, res) => {
   const authHeader = req.headers['authorization'];

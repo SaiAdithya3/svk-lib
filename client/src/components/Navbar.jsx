@@ -26,7 +26,7 @@ const Navbar = () => {
         <div className="navbar-center">
           <div className="flex gap-1 items-center border border-slate-300 bg-zinc-50 px-3 rounded-3xl">
             <Search className='size-5'/>
-            <input type="text" className="pr-8 pl-2 font- popp py-2 bg-zinc-50 rounded-r-3xl overflow-hidden focus:outline-none" placeholder="Search..." />
+            <input type="text" className="pr-8 pl-2 font-popp py-2 bg-zinc-50 rounded-r-3xl overflow-hidden focus:outline-none" placeholder="Search..." />
           </div>
         </div>
         <div className="navbar-end">

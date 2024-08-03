@@ -34,7 +34,7 @@ const App = () => {
     <>
       <div className="w-full flex flex-row items-start">
         {!isLoginPage && <Sidebar />}
-        <div className="w-full flex flex-col">
+        <div className="w-full flex flex-col"> 
           {!isLoginPage && <Navbar />}
           <Routes>
             <Route path="/" element={<Login />} />

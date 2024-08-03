@@ -28,7 +28,7 @@ const Dashboard = () => {
         setUserRole(response.role);
       } catch (error) {
         console.error("Authentication check failed:", error);
-        navigate("/login");
+        navigate("/");
       }
     };
 

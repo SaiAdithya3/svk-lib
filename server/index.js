@@ -34,3 +34,29 @@ app.listen(3000, () => {
   connectDB();
   console.log('We are on port 3000');
 });
+
+// import Student from './schemas/studentSchema.js';
+
+// const createStudent = async () => {
+//   const dobString = '03-09-2004'; // Assuming this is in DD-MM-YYYY format
+
+//   const newStudent = new Student({
+//     name: 'Sai Aditya',
+//     studentId: '002',
+//     email: 'sai@gmail.com',
+//     phone: '123-456-7890',
+//     branch: 'Computer Science',
+//     year: '3rd',
+//     dob: dobString, // Save DOB as string
+//   });
+
+//   try {
+//     const savedStudent = await newStudent.save();
+//     console.log('Student saved:', savedStudent);
+//   } catch (error) {
+//     console.error('Error saving student:', error);
+//   }
+// };
+
+// createStudent();
+

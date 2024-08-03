@@ -1,6 +1,12 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Library, HandHelping, BookCheck, Clock8, ChartColumn } from 'lucide-react';
+import {
+  Library,
+  HandHelping,
+  BookCheck,
+  Clock8,
+  ChartColumn,
+} from "lucide-react";
 
 const Icon = ({ IconComponent, ...props }) => (
   <IconComponent {...props} className="w-5 h-5" />
@@ -9,7 +15,9 @@ const Icon = ({ IconComponent, ...props }) => (
 const NavItem = ({ to, icon: IconComponent, children, badge }) => {
   const location = useLocation();
   const isActive = location.pathname === to;
-  const activeClass = isActive ? "text-zinc-50 px-4 bg-black hover:text-black" : "text-muted-foreground";
+  const activeClass = isActive
+    ? "text-zinc-50 px-4 bg-black hover:text-black"
+    : "text-muted-foreground";
 
   return (
     <li>
@@ -31,65 +39,85 @@ const NavSection = ({ title, children }) => (
   </div>
 );
 
-const Sidebar = () => (
-  <div className="flex sticky top-0 h-screen bg-gray-100">
-    <aside className="w-64 flex flex-col justify-between bg-white border-r">
-      <div className="flex flex-col w-full">
-
-        <div className="flex items-center justify-start px-4 h-24 border-b">
-          <img src='https://dial4college.blr1.cdn.digitaloceanspaces.com/pro/375/logo/1696497345.jpg' className="w-20" />
-          <div className="ml-3 ">
-            <h2 className="text-lg font-semibold">Sri Krishna Devaraya </h2>
+const Sidebar = () => {
+  const roleType = localStorage.getItem("userType");
+  return (
+    <div className="flex sticky top-0 h-screen bg-gray-100">
+      <aside className="w-64 flex flex-col justify-between bg-white border-r">
+        <div className="flex flex-col w-full">
+          <div className="flex items-center justify-start px-4 h-24 border-b">
+            <img
+              src="https://dial4college.blr1.cdn.digitaloceanspaces.com/pro/375/logo/1696497345.jpg"
+              className="w-20"
+            />
+            <div className="ml-3 ">
+              <h2 className="text-lg font-semibold">Sri Krishna Devaraya </h2>
+            </div>
+          </div>
+          <nav className="p-4 space-y-4">
+            <NavSection title="MAIN">
+              {roleType === "admin" && (
+                <>
+                  <NavItem to="/dashboard" icon={LayoutDashboardIcon}>
+                    Dashboard
+                  </NavItem>
+                  <NavItem to="/books" icon={Library}>
+                    Books Catalogue
+                  </NavItem>
+                  <NavItem to="/borrow" icon={HandHelping}>
+                    Borrow Books
+                  </NavItem>
+                  <NavItem to="/returnbooks" icon={BookCheck}>
+                    Return Books
+                  </NavItem>
+                  <NavItem to="/students" icon={GroupIcon}>
+                    Students
+                  </NavItem>
+                  <NavItem to="/overdues" icon={Clock8}>
+                    Overdues
+                  </NavItem>
+                  <NavItem to="/activity" icon={ChartColumn}>
+                    Activity log
+                  </NavItem>
+                </>
+              )}
+              {roleType === "student" && (
+                <>
+                  <NavItem to="/student-dashboard" icon={LayoutDashboardIcon}>
+                    Dashboard
+                  </NavItem>
+                  <NavItem to="/books" icon={Library}>
+                    Search Books
+                  </NavItem>
+                  <NavItem to="/activity" icon={ChartColumn}>
+                    My Activity log
+                  </NavItem>
+                </>
+              )}
+            </NavSection>
+          </nav>
+          <div className="hidden p-4 mt-auto">
+            <NavItem to="/settings" icon={SettingsIcon}>
+              Settings
+            </NavItem>
+            <NavItem to="/support" icon={PowerIcon}>
+              Support
+            </NavItem>
           </div>
         </div>
-        <nav className="p-4 space-y-4">
-          <NavSection title="MAIN">
-            <NavItem to="/dashboard" icon={LayoutDashboardIcon}>
-              Dashboard
-            </NavItem>
-            <NavItem to="/books" icon={Library}>
-              Books Catalogue
-            </NavItem>
-            <NavItem to="/borrow" icon={HandHelping}>
-              Borrow Books
-            </NavItem>
-            <NavItem to="/returnbooks" icon={BookCheck}>
-              Return Books
-            </NavItem>
-            <NavItem to="/students" icon={GroupIcon}>
-              Students
-            </NavItem>
-            <NavItem to="/overdues" icon={Clock8}>
-              Overdues
-            </NavItem>
-            <NavItem to="/activity" icon={ChartColumn}>
-              Activity log
-            </NavItem>
-          </NavSection>
 
-        </nav>
-        <div className="hidden p-4 mt-auto">
-          <NavItem to="/settings" icon={SettingsIcon}>
-            Settings
-          </NavItem>
-          <NavItem to="/support" icon={PowerIcon}>
-            Support
-          </NavItem>
+        <div className="hover:bg-zinc-100 group cursor-pointer flex items-center p-4 border-t">
+          {/* <Avatar name="banaki" variant="beam" /> */}
+          <div className="ml-3">
+            <h3 className="text-sm font-semibold">Bankai muz</h3>
+            <p className="text-xs text-muted-foreground">info@devatoms.com</p>
+          </div>
+          {/* <HiMiniChevronRight className="text-2xl mx-2 group-hover:translate-x-2 transition-all" /> */}
         </div>
-      </div>
-
-      <div className="hover:bg-zinc-100 group cursor-pointer flex items-center p-4 border-t">
-        {/* <Avatar name="banaki" variant="beam" /> */}
-        <div className="ml-3">
-          <h3 className="text-sm font-semibold">Bankai muz</h3>
-          <p className="text-xs text-muted-foreground">info@devatoms.com</p>
-        </div>
-        {/* <HiMiniChevronRight className="text-2xl mx-2 group-hover:translate-x-2 transition-all" /> */}
-      </div>
-    </aside>
-  </div>
-);
-
+      </aside>
+    </div>
+  );
+};
 const CalendarIcon = (props) => (
   <svg
     {...props}

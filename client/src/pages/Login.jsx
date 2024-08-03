@@ -32,7 +32,11 @@ const Login = () => {
   const onSubmit = async (data) => {
     try {
       let response;
-      response = await login(data.email, data.password, userType);
+      response = await login(
+        userType === "student" ? data.regNo : data.email,
+        userType === "admin" ? data.password : data.dob,
+        userType
+      );
       localStorage.setItem('token', response.token);
       localStorage.setItem('userType', userType); // Save user type to local storage
       toast.success(`Logged in as ${userType}`);
@@ -97,35 +101,35 @@ const LoginForm = ({
         </select>
       </div>
       <div className="w-full">
-        <label htmlFor="email" className="block text-sm font-medium text-black">
-          Email
+        <label htmlFor={userType === "student" ? "regNo" : "email"} className="block text-sm font-medium text-black">
+          {userType === "student" ? "Registration Number" : "Email"}
         </label>
         <input
-          id="email"
-          type="email"
-          placeholder="Enter your email"
-          {...register("email", { required: "Email is required" })}
+          id={userType === "student" ? "regNo" : "email"}
+          type={userType === "student" ? "text" : "email"}
+          placeholder={userType === "student" ? "Enter your registration number" : "Enter your email"}
+          {...register(userType === "student" ? "regNo" : "email", { required: `${userType === "student" ? "Registration Number" : "Email"} is required` })}
           className="mt-1 block w-full py-4 px-4 border border-gray-300 
           rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
         />
-        {errors.email && (
-          <span className="text-red-500 text-sm">{errors.email.message}</span>
+        {errors[userType === "student" ? "regNo" : "email"] && (
+          <span className="text-red-500 text-sm">{errors[userType === "student" ? "regNo" : "email"].message}</span>
         )}
       </div>
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-black">
-          Password
+        <label htmlFor={userType === "admin" ? "password" : "dob"} className="block text-sm font-medium text-black">
+          {userType === "admin" ? "Password" : "Date of Birth"}
         </label>
         <input
-          id="password"
-          type="password"
-          placeholder="Enter your password"
-          {...register("password", { required: "Password is required" })}
+          id={userType === "admin" ? "password" : "dob"}
+          type={userType === "admin" ? "password" : "date"}
+          placeholder={userType === "admin" ? "Enter your password" : "Enter your date of birth"}
+          {...register(userType === "admin" ? "password" : "dob", { required: `${userType === "admin" ? "Password" : "Date of Birth"} is required` })}
           className="mt-1 block w-full py-4 px-4 border border-gray-300
            rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
         />
-        {errors.password && (
-          <span className="text-red-500 text-sm">{errors.password.message}</span>
+        {errors[userType === "admin" ? "password" : "dob"] && (
+          <span className="text-red-500 text-sm">{errors[userType === "admin" ? "password" : "dob"].message}</span>
         )}
       </div>
       <div>
