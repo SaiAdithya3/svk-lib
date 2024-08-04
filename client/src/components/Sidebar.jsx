@@ -7,6 +7,7 @@ import {
   Clock8,
   ChartColumn,
 } from "lucide-react";
+import bankai from "../assets/bankai.png";
 
 const Icon = ({ IconComponent, ...props }) => (
   <IconComponent {...props} className="w-5 h-5" />
@@ -47,12 +48,12 @@ const Sidebar = () => {
         <div className="flex flex-col w-full">
           <div className="flex items-center justify-start px-4 h-24 border-b">
             <img
-              src="https://dial4college.blr1.cdn.digitaloceanspaces.com/pro/375/logo/1696497345.jpg"
-              className="w-20"
+              src={bankai}
+              className="w-full"
             />
-            <div className="ml-3 ">
+            {/* <div className="ml-3 ">
               <h2 className="text-lg font-semibold">Sri Krishna Devaraya </h2>
-            </div>
+            </div> */}
           </div>
           <nav className="p-4 space-y-4">
             <NavSection title="MAIN">
@@ -65,7 +66,7 @@ const Sidebar = () => {
                     Books Catalogue
                   </NavItem>
                   <NavItem to="/borrow" icon={HandHelping}>
-                    Borrow Books
+                    Issue Books
                   </NavItem>
                   <NavItem to="/returnbooks" icon={BookCheck}>
                     Return Books

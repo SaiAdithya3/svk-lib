@@ -1,4 +1,4 @@
-import Student from "../schemas/studentSchema.js"; // Adjust the path to your Student model
+import Student from "../schemas/studentSchema.js"; 
 
 export const createStudent = async (req, res) => {
   try {

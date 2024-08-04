@@ -16,7 +16,7 @@ export const sendEmail = async (email, name, qrCode, bookNames) => {
   const mailOptions = {
     from: process.env.EMAIL,
     to: email,
-    subject: "SVK Library - Book Loan",
+    subject: "SKU Library - Book Loan",
     attachDataUrls: true,
     html: `<!DOCTYPE html>
 <html lang="en">
@@ -127,7 +127,7 @@ export const sendEmail = async (email, name, qrCode, bookNames) => {
       </div>
       <div>
         <h2>
-        SVK Library
+        SKU Library
         </h2>
         <p>Book Loan</p>
       </div>

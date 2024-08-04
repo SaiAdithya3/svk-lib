@@ -131,7 +131,7 @@ const BorrowBooks = () => {
   return (
     <div className="w-full py-6 flex flex-col px-6 items-center relative">
       <h1 className="text-2xl px-3 text-start w-full font-bold text-gray-800 mb-4">
-        Borrow Books
+        Issue Books
       </h1>
       <div className="w-full px-3 flex mb-4 justify-between">
         <div className="w-2/3 px-4 flex bg-zinc-100 items-center gap-2 border border-gray-300 rounded-lg">

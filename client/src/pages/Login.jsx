@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import logoImg from "../assets/logo.jpg";
@@ -6,12 +6,13 @@ import { login } from "../services/authServices";
 import { useNavigate } from "react-router-dom";
 import { getToken } from "../services/getToken";
 import { validateAdminToken } from "../services/authServices";
+import { ChevronDown } from "lucide-react";
 
 const Login = () => {
   const [userType, setUserType] = useState("student");
   const { register, handleSubmit, formState: { errors } } = useForm();
   const navigate = useNavigate();
-
+  
   const token = getToken();
   useEffect(() => {
     if (token) {
@@ -50,9 +51,9 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-around">
       <ImageSection imageUrl={logoImg} />
-      <div className="w-1/2 flex flex-col justify-center p-8">
+      <div className="border-l h-screen w-1/2 items-center flex flex-col justify-center p-8">
         <h1 className="text-2xl font-bold mb-6 text-black">
-          Welcome to SK Library Management System
+          Welcome to SKU Library Management System
         </h1>
         <LoginForm
           userType={userType}
@@ -83,27 +84,62 @@ const LoginForm = ({
   errors,
   onSubmit
 }) => {
+  const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const handleDropdownToggle = () => {
+    setDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleOutsideClick = (event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setDropdownOpen(false);
+    }
+  };
+
+  const handleUserTypeSelect = (type) => {
+    setUserType(type);
+    setDropdownOpen(false);
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, []);
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 w-[70%]">
-     <div className="w-full">
+      <div className="w-full">
         <label htmlFor="userType" className="block text-lg font-semibold text-black">
           Login as
         </label>
-        <div className="relative mt-1">
-          <select
-            id="userType"
-            value={userType}
-            onChange={(e) => setUserType(e.target.value)}
-            className="block w-full py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-black placeholder-gray-500 focus:ring-2 focus:ring-black focus:border-black sm:text-sm appearance-none"
+        <div className="relative mt-1" ref={dropdownRef}>
+          <button
+            type="button"
+            onClick={handleDropdownToggle}
+            className="w-full py-3 px-4 flex items-center justify-between border border-gray-300 rounded-lg shadow-sm bg-white text-black placeholder-gray-500 focus:ring-2 focus:ring-black focus:border-black sm:text-sm"
           >
-            <option className='p-2' value="student">Student</option>
-            <option value="admin">Admin</option>
-          </select>
-          <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </div>
+            {userType === "student" ? "Student" : "Admin"}
+            <ChevronDown className="ml-3" />
+          </button>
+          {isDropdownOpen && (
+            <div className="absolute w-full right-0 mt-2 bg-white border rounded shadow-lg">
+              <div
+                onClick={() => handleUserTypeSelect("student")}
+                className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer"
+              >
+                Student
+              </div>
+              <div
+                onClick={() => handleUserTypeSelect("admin")}
+                className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer"
+              >
+                Admin
+              </div>
+            </div>
+          )}
         </div>
       </div>
       <div className="w-full">
@@ -115,8 +151,7 @@ const LoginForm = ({
           type={userType === "student" ? "text" : "email"}
           placeholder={userType === "student" ? "Enter your registration number" : "Enter your email"}
           {...register(userType === "student" ? "regNo" : "email", { required: `${userType === "student" ? "Registration Number" : "Email"} is required` })}
-          className="mt-1 block w-full py-3 px-4 border border-gray-300 
-          rounded-md text-2xl shadow-sm popp focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+          className="mt-1 block w-full py-3 px-4 border border-gray-300 rounded-md text-2xl shadow-sm focus:ring-black focus:border-black sm:text-sm"
         />
         {errors[userType === "student" ? "regNo" : "email"] && (
           <span className="text-red-500 text-sm">{errors[userType === "student" ? "regNo" : "email"].message}</span>
@@ -131,8 +166,7 @@ const LoginForm = ({
           type={userType === "admin" ? "password" : "date"}
           placeholder={userType === "admin" ? "Enter your password" : "Enter your date of birth"}
           {...register(userType === "admin" ? "password" : "dob", { required: `${userType === "admin" ? "Password" : "Date of Birth"} is required` })}
-          className="mt-1 block w-full py-3 px-4 border border-gray-300
-           rounded-md shadow-sm popp text-xl focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+          className="mt-1 block w-full py-3 px-4 border border-gray-300 rounded-md shadow-sm text-xl focus:ring-black focus:border-black sm:text-sm"
         />
         {errors[userType === "admin" ? "password" : "dob"] && (
           <span className="text-red-500 text-sm">{errors[userType === "admin" ? "password" : "dob"].message}</span>
@@ -141,8 +175,7 @@ const LoginForm = ({
       <div>
         <button
           type="submit"
-          className="w-full py-4 px-4 bg-black text-white font-semibold rounded-md
-          shadow hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+          className="w-full py-4 px-4 bg-black text-white font-semibold rounded-md shadow hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
         >
           Login
         </button>

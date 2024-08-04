@@ -54,7 +54,7 @@ const Dashboard = () => {
               </div>
               <div className="flex flex-col items-start gap-2">
                 <div className="stat-title text-xl">Borrowed books</div>
-                <div className="stat-value">375</div>
+                <div className="stat-value popp">375</div>
               </div>
               {/* <div className="stat-desc">Jan 1st - Feb 1st</div> */}
             </div>
@@ -64,7 +64,7 @@ const Dashboard = () => {
               </div>
               <div className="flex flex-col items-start gap-2">
                 <div className="stat-title text-xl">Overdue</div>
-                <div className="stat-value">375</div>
+                <div className="stat-value popp">375</div>
               </div>
               {/* <div className="stat-desc">Jan 1st - Feb 1st</div> */}
             </div>
@@ -74,7 +74,7 @@ const Dashboard = () => {
               </div>
               <div className="flex flex-col items-start gap-2">
                 <div className="stat-title text-xl">Available books</div>
-                <div className="stat-value">25,785</div>
+                <div className="stat-value popp">25,785</div>
               </div>
               {/* <div className="stat-desc">Jan 1st - Feb 1st</div> */}
             </div>

@@ -10,7 +10,7 @@ const adminSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  // Other fields if any
+  
 });
 
 export default mongoose.model('Admin', adminSchema);
