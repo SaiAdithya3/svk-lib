@@ -4,6 +4,7 @@ import { Disc2, LoaderPinwheel, Pencil, Search } from "lucide-react";
 import BookModal from '../components/BookModal';
 import { getBooks, searchBooks } from '../services/services';
 
+
 const BooksCatalogue = () => {
   const [searchText, setSearchText] = useState('');
   const [selectedBook, setSelectedBook] = useState(null);
@@ -13,7 +14,7 @@ const BooksCatalogue = () => {
   const [loading, setLoading] = useState(false);
   const [debounceTimeout, setDebounceTimeout] = useState(null);
   const [bankai, setBankai] = useState('');
-
+  const roleType = localStorage.getItem("userType");
   const navigate = useNavigate();
 
   const fetchBooks = async (page, search) => {
@@ -108,7 +109,9 @@ const BooksCatalogue = () => {
                 <th className="px-4 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">Author</th>
                 <th className="px-2 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">Copies</th>
                 <th className="px-4 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">Location</th>
-                <th className="px-4 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">Edit</th>
+                {roleType === 'admin' && (
+                  <th className="px-4 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">Edit</th>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -120,9 +123,11 @@ const BooksCatalogue = () => {
                   <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.author}</td>
                   <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.copies.filter(copy => copy.status === 'available').length} / {book.copies.length}</td>
                   <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.location}</td>
-                  <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">
-                    <Pencil className='size-7 border p-1.5 rounded-lg' />
-                  </td>
+                  {roleType === 'admin' && (
+                    <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">
+                      <Pencil className='size-7 border p-1.5 rounded-lg' />
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
