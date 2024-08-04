@@ -1,6 +1,10 @@
 import nodemailer from "nodemailer";
 
-export const sendEmail = async (email, name, qrCode , bookNames) => {
+export const sendEmail = async (email, name, qrCode, bookNames) => {
+  console.log("Sending email to:", email);
+  console.log("Book names:", bookNames);
+  // console.log("QR code:", qrCode);
+  console.log(name);
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -140,22 +144,14 @@ export const sendEmail = async (email, name, qrCode , bookNames) => {
     <div class="content">
       <p>Books:</p>
       <div class="books">
-        <div class="book">
-          <p>The Great Gatsby</p>
-          <p>by F. Scott Fitzgerald</p>
-        </div>
-        <div class="book">
-          <p>To Kixxll a Mockingbird</p>
-          <p>by Harper Lee</p>
-        </div>
-        <div class="book">
-          <p>1984</p>
-          <p>by George Orwell</p>
-        </div>
-        <div class="book">
-          <p>Pride and Prejudice</p>
-          <p>by Jane Austen</p>
-        </div>
+        ${
+          bookNames.map((book) => `
+            <div class="book">
+              <p>${book}</p>
+            </div>
+          `).join("")
+        }
+        
       </div>
     </div>
     <div class="separator"></div>

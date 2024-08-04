@@ -40,6 +40,10 @@ const BorrowBooks = () => {
       clearTimeout(debounceTimeout);
     }
 
+    if (query.length === 0) {
+      setBooks([]);
+      return;
+    }
     setDebounceTimeout(
       setTimeout(() => {
         fetchBooks(query);
@@ -95,10 +99,10 @@ const BorrowBooks = () => {
 
   const handleSelectBook = (code) => {
     const book = codeSelectionBook;
-  
+
     // Check if the book with the same ISBN already exists in selectedBooks
     const existingBookIndex = selectedBooks.findIndex(b => b.isbn === book.isbn);
-  
+
     if (existingBookIndex !== -1) {
       // Replace the existing book with the new code
       const updatedBooks = [...selectedBooks];
@@ -115,10 +119,10 @@ const BorrowBooks = () => {
       };
       setSelectedBooks([...selectedBooks, newBook]);
     }
-  
+
     setCodeSelectionBook(null);
   };
-  
+
 
   const handleRemoveBook = (book) => {
     setSelectedBooks(selectedBooks.filter((b) => b !== book));
@@ -203,19 +207,19 @@ const BorrowBooks = () => {
                     />
                   </td>
                   <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">
-                    {book.bookid}
+                    {index + 1}
                   </td>
                   <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">
-                    {book.isbn}
+                    {book.isbn && book.isbn}
                   </td>
                   <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">
-                    {book.title}
+                    {book.title && book.title}
                   </td>
                   <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">
-                    {book.author}
+                    {book.author && book.author}
                   </td>
                   <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">
-                    {book.availableCopies} / {book.totalCopies}
+                    {book.copies.filter(copy => copy.status === 'available').length} / {book.copies.length}
                   </td>
                   <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">
                     <button
@@ -252,12 +256,12 @@ const BorrowBooks = () => {
 
       {isBorrowing && (
         <BorrowBookModal
-        studentDetails={studentDetails}
-        selectedBooks={selectedBooks}
-        onClose={() => setIsBorrowing(false)}
-        onConfirm={handleConfirmBorrow}
-        onStudentSearch={handleStudentSearch}
-      />
+          studentDetails={studentDetails}
+          selectedBooks={selectedBooks}
+          onClose={() => setIsBorrowing(false)}
+          onConfirm={handleConfirmBorrow}
+          onStudentSearch={handleStudentSearch}
+        />
       )}
 
       {selectedBooks.length > 0 && (

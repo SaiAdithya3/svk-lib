@@ -28,6 +28,7 @@ const ReturnBooks = () => {
     try {
       const books = await unreturnedBooks1();
       setUnreturnedBooks(books);
+      console.log(books);
     } catch (error) {
       console.error("Error fetching unreturned books:", error);
       toast.error("An error occurred while fetching unreturned books.");
@@ -83,8 +84,8 @@ const ReturnBooks = () => {
   };
 
   const filteredBooks = unreturnedBooks.filter((book) => {
-    const title = book?.title?.toLowerCase() || "";
-    const isbn = book?.isbn?.toLowerCase() || "";
+    const title = book?.bookDetails[0]?.title?.toLowerCase() || "";
+    const isbn = book?.bookDetails[0]?.isbn?.toLowerCase() || "";
     const searchLower = searchText.toLowerCase();
 
     return title.includes(searchLower) || isbn.includes(searchLower);

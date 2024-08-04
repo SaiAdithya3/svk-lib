@@ -30,35 +30,37 @@ const BookTable = ({ books, selectedBook, handleSelectBook }) => {
         </tbody>
       ) : (
         <tbody>
-          {books.map((book, index) => (
-            <tr
-              key={index}
-              className={`hover:bg-gray-50 popp cursor-pointer ${selectedBook === book ? 'bg-gray-200' : ''}`}
-              onClick={() => handleSelectBook(book)}
-            >
-              <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">
-                <input
-                  type="checkbox"
-                  checked={selectedBook === book}
-                  onChange={() => handleSelectBook(book)}
-                />
-              </td>
-              <td className="px-4 py-4 border-b truncate border-gray-200 text-sm text-gray-700">{index + 1}</td>
-              <td className="px-4 py-4 border-b truncate border-gray-200 text-sm text-gray-700">{book.isbn}</td>
-              <td className="px-4 py-4 border-b truncate border-gray-200 text-sm text-gray-700">
-                {book.bookId && book.bookId[0].title}
-              </td>
-              <td className="px-4 py-4 border-b truncate border-gray-200 text-sm text-gray-700">{book.studentId && book.studentId.name}</td>
-              <td className="px-4 py-4 border-b truncate border-gray-200 text-sm text-gray-700">
-                {new Date(book.borrowDate).toLocaleString('en-US', {
-                  dateStyle: 'short',
-                  timeStyle: 'short'
-                })}
-              </td>
-              <td className={`px-4 py-4 border-b truncate border-gray-200 text-sm ${calculateStatus(book.borrowDate) === 'Overdue' ? 'text-red-500' : 'text-green-600'}`}>
-                {calculateStatus(book.borrowDate)}
-              </td>
-            </tr>
+          {books.map((loan, index) => (
+            <React.Fragment key={loan._id}>
+              {loan.bookDetails.map((book, bookIndex) => (
+                <tr
+                  key={`${loan._id}-${book._id}`}
+                  className={`hover:bg-gray-50 popp cursor-pointer ${selectedBook === loan ? 'bg-gray-200' : ''}`}
+                  onClick={() => handleSelectBook(loan)}
+                >
+                  <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">
+                    <input
+                      type="checkbox"
+                      checked={selectedBook === loan}
+                      onChange={() => handleSelectBook(loan)}
+                    />
+                  </td>
+                  <td className="px-4 py-4 border-b truncate border-gray-200 text-sm text-gray-700">{index + 1}</td>
+                  <td className="px-4 py-4 border-b truncate border-gray-200 text-sm text-gray-700">{book.isbn}</td>
+                  <td className="px-4 py-4 border-b truncate border-gray-200 text-sm text-gray-700">{book.title}</td>
+                  <td className="px-4 py-4 border-b truncate border-gray-200 text-sm text-gray-700">{loan.studentId.name}</td>
+                  <td className="px-4 py-4 border-b truncate border-gray-200 text-sm text-gray-700">
+                    {new Date(loan.date).toLocaleString('en-US', {
+                      dateStyle: 'short',
+                      timeStyle: 'short'
+                    })}
+                  </td>
+                  <td className={`px-4 py-4 border-b truncate border-gray-200 text-sm ${calculateStatus(loan.date) === 'Overdue' ? 'text-red-500' : 'text-green-600'}`}>
+                    {calculateStatus(loan.date)}
+                  </td>
+                </tr>
+              ))}
+            </React.Fragment>
           ))}
         </tbody>
       )}

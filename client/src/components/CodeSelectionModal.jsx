@@ -1,11 +1,10 @@
-// components/CodeSelectionModal.jsx
 import React, { useState } from 'react';
 
 const CodeSelectionModal = ({ book, onClose, onSelectCode }) => {
   const [selectedCode, setSelectedCode] = useState('');
 
-  const handleCodeChange = (e) => {
-    setSelectedCode(e.target.value);
+  const handleCodeChange = (code) => {
+    setSelectedCode(code);
   };
 
   const handleConfirm = () => {
@@ -22,38 +21,39 @@ const CodeSelectionModal = ({ book, onClose, onSelectCode }) => {
         <div>
           <ul className="space-y-2 select-none">
             {book.copies.map((copy) => (
-              <li key={copy.code} className={`border p-2 rounded-md flex gap-4 relative ${copy.status === 'borrowed' ? 'bg-gray-200' : ''}`}>
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="copyCode"
-                    value={copy.code}
-                    checked={selectedCode === copy.code}
-                    onChange={handleCodeChange}
-                    className="mr-2"
-                    disabled={copy.status === 'borrowed'}
-                  />
-                  {copy.code}
-                </label>
+              <label
+                key={copy.code}
+                className={`border p-2 rounded-md flex gap-4 hover:bg-zinc-100 relative ${copy.status === 'borrowed' ? 'bg-gray-200 cursor-not-allowed' : 'cursor-pointer'}`}
+                onClick={() => handleCodeChange(copy.code)}
+              >
+                <input
+                  type="radio"
+                  name="copyCode"
+                  value={copy.code}
+                  checked={selectedCode === copy.code}
+                  onChange={() => handleCodeChange(copy.code)}
+                  className="mr-2"
+                  disabled={copy.status === 'borrowed'}
+                />
+                {copy.code}
                 {copy.status === 'available' && (
-                  <div>                  
-                    {/* <span className="text-sm text-green-500">– Available</span> */}
+                  <div>
                     <span className='size-2 bg-green-500 rounded-full absolute right-1 top-1 ring-green-200 ring-2'></span>
                   </div>
                 )}
-              </li>
+              </label>
             ))}
           </ul>
         </div>
-        <div className="mt-4 flex justify-end gap-2">
+        <div className="mt-4 flex w-full justify-end gap-2">
           <button
-            className="px-4 py-2 bg-gray-500 text-white rounded-md"
+            className="px-4 py-2 bg-red-500 text-white rounded-md"
             onClick={onClose}
           >
             Cancel
           </button>
           <button
-            className="px-4 py-2 bg-blue-600 text-white rounded-md"
+            className="px-4 py-2 w-full bg-zinc-900 text-white rounded-md"
             onClick={handleConfirm}
           >
             Confirm

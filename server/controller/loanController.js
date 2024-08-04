@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import Book from "../schemas/bookSchema.js";
 import Loan from "../schemas/loanSchema.js";
-import Student from "../schemas/studentSchema.js"; // Ensure this is defined correctly
+import Student from "../schemas/studentSchema.js";
 import { generateQRCode } from "../utils/qrCodeHelper.js";
 import { sendEmail } from "../utils/emailHelper.js";
 
@@ -64,16 +64,16 @@ export const addLoan = async (req, res) => {
     const loan = new Loan({
       studentId,
       bookCopyCodes,
+      bookDetails: books.map(book => book._id),
       status: "borrowed",
     });
     await loan.save();
 
     const bookNames = books.map(book => book.title);
 
-
     // Generate QR code and send email
     const qrCode = await generateQRCode(loan._id);
-    const emailSent = await sendEmail(student.email, student.name, qrCode , bookNames);
+    const emailSent = await sendEmail(student.email, student.name, qrCode, bookNames);
 
     if (!emailSent) {
       return res.status(500).json({ message: "Error sending email" });
@@ -85,6 +85,7 @@ export const addLoan = async (req, res) => {
     res.status(500).json({ message: "Internal server error", details: error.message });
   }
 };
+
 
 export const returnLoan = async (req, res) => {
   const { loanId } = req.body;
@@ -199,7 +200,11 @@ export const getAllLoans = async (req, res) => {
         select: 'name email'
       })
       .populate({
-        path: 'bookCopyCodes', // Use `bookCopyCodes` instead of `bookId`
+        path: 'bookCopyCodes',
+        select: 'title author isbn'
+      })
+      .populate({
+        path: 'bookDetails',
         select: 'title author isbn'
       });
 
@@ -227,7 +232,10 @@ export const getLoanById = async (req, res) => {
         select: 'name email'
       })
       .populate({
-        path: 'bookCopyCodes', // Use `bookCopyCodes` instead of `bookId`
+        path: 'bookCopyCodes',
+        select: 'title author isbn'
+      }).populate({
+        path: 'bookDetails',
         select: 'title author isbn'
       });
 
@@ -250,14 +258,18 @@ export const unreturnedBooks = async (req, res) => {
     const unreturnedLoans = await Loan.find({
       returned: { $exists: false }
     })
-    .populate({
-      path: 'studentId',
-      select: 'name studentId'
-    })
-    .populate({
-      path: 'bookCopyCodes', // Use `bookCopyCodes` instead of `bookId`
-      select: 'title author isbn bookCopyCodes status'
-    });
+      .populate({
+        path: 'studentId',
+        select: 'name studentId'
+      })
+      .populate({
+        path: 'bookCopyCodes',
+        select: 'title author isbn bookCopyCodes status'
+      })
+      .populate({
+        path: 'bookDetails', 
+        select: 'title author isbn'
+      });
 
     res.json(unreturnedLoans);
   } catch (error) {
