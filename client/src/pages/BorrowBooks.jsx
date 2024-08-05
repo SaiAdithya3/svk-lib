@@ -17,6 +17,10 @@ const BorrowBooks = () => {
   const [codeSelectionBook, setCodeSelectionBook] = useState(null);
   const [debounceTimeout, setDebounceTimeout] = useState(null);
   const [loading, setLoading] = useState(false);
+  const roleType = localStorage.getItem("userType");
+  const user = JSON.parse(localStorage.getItem("user"));
+  const issuedBy = roleType === "admin" ? user.admin.id : '';
+  console.log(issuedBy);
 
   const navigate = useNavigate();
 
@@ -76,9 +80,11 @@ const BorrowBooks = () => {
 
   const handleConfirmBorrow = async () => {
     setIsBorrowing(false);
+    console.log(studentDetails.id);
     try {
       await borrowBooks(
         studentDetails.id,
+        issuedBy,
         selectedBooks.map((book) => book._id),
         selectedBooks.map((book) => book.code)
       );
@@ -129,7 +135,7 @@ const BorrowBooks = () => {
   };
 
   return (
-    <div className="w-full py-6 flex flex-col px-6 items-center relative">
+    <div className="w-full py-6 mt-16 md:mt-0 flex flex-col px-6 items-center relative">
       <h1 className="text-2xl px-3 text-start w-full font-bold text-gray-800 mb-4">
         Issue Books
       </h1>

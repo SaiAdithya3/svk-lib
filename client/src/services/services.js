@@ -77,20 +77,21 @@ export const searchBooks = async (query) => {
     }
 };
 
-export const borrowBooks = async (studentId, bookIds, bookCopyCodes) => {
-    try {
-        const token = getToken();
-        
-        const response = await axios.post(`${BASE_URL}/loan/add-loan`, { studentId, bookIds, bookCopyCodes }, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
-        return response.data;
-    } catch (error) {
-        console.error('Error borrowing books:', error);
-        throw error;
-    }
+export const borrowBooks = async (studentId, issuedBy, bookIds, bookCopyCodes) => {
+  try {
+      const token = getToken();
+      console.log('a',studentId,'bookid', bookIds,'bookcopy', bookCopyCodes,'issued', issuedBy);
+      const response = await axios.post(`${BASE_URL}/loan/add-loan`, 
+      { studentId: studentId, issuedBy: issuedBy, bookIds, bookCopyCodes: bookCopyCodes }, {
+          headers: {
+              Authorization: `Bearer ${token}`
+          }
+      });
+      return response.data;
+  } catch (error) {
+      console.error('Error borrowing books:', error);
+      throw error;
+  }
 };
 
 

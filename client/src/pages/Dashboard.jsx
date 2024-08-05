@@ -46,13 +46,13 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className="w-full flex flex-col gap-4 px-4 py-4 items-center">
-        <div className="w-full px-4 flex py-5 gap-5">
-          <div className="w-1/3 flex bg-gradient-to-r gap-2 from-violet-200 to-pink-200 rounded-3xl text-violet-950 items-start px-8 flex-col py-10 ">
+      <div className="w-full flex mt-12 md:mt-0 flex-col gap-4 px-4 py-4 items-center">
+        <div className="w-full px-4 flex-col md:flex-row flex py-5 gap-5">
+          <div className="w-full md:w-1/3 flex bg-gradient-to-r gap-2 from-violet-200 to-pink-200 rounded-3xl text-violet-950 items-start px-8 flex-col py-10 ">
             <h1 className="text-3xl font-bold">Hello {bankai && bankai.name} 👋!</h1>
             <p className="text-lg popp">Welcome to the dashboard</p>
           </div>
-          <div className="w-2/3 stats shadow border">
+          <div className="w-full md:w-2/3 stats shadow border">
             <div className="stat flex justify-around px-6 items-center flex-row-reverse">
               <div className="stat-figure ">
                 <Handshake className="size-10 text-zinc-500" />

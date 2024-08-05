@@ -22,8 +22,8 @@ const ActivityLog = () => {
           date: new Date(loan.date).toLocaleDateString(), // Format date if needed
           action: loan.status === 'borrowed' ? 'Borrowed Book' : 'Returned Book',
           details: (
-            loan.bookId && Array.isArray(loan.bookId) ? 
-            `${loan.bookId.map(book => book.title).join(', ')} was ${loan.status === 'borrowed' ? 'borrowed' : 'returned'} by ${loan.studentId.name}.` :
+            loan.bookDetails && Array.isArray(loan.bookDetails) ? 
+            `${loan.bookDetails.map(book => book.title).join(', ')} was ${loan.status === 'borrowed' ? 'borrowed' : 'returned'} by ${loan.studentId.name}.` :
             `Error: Book details not available for loan ID ${loan._id}`
           )
         }));

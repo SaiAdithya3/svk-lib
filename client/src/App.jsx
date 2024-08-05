@@ -27,15 +27,23 @@ const App = () => {
     // Redirect to login page if token is not present
     if (!token && !isLoginPage) {
       navigate("/");
-    } 
+    }
   }, [navigate, isLoginPage]);
 
   return (
     <>
       <div className="w-full flex flex-row items-start">
-        {!isLoginPage && <Sidebar />}
-        <div className="w-full flex flex-col"> 
-          {!isLoginPage && <Navbar />}
+        {!isLoginPage &&
+          <div className="md:sticky top-0">
+            <Sidebar />
+          </div>
+        }
+        <div className="w-full flex flex-col">
+          {!isLoginPage &&
+            <div className="md:flex hidden">
+              <Navbar />
+            </div>
+          }
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/dashboard" element={<Dashboard />} />

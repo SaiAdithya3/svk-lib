@@ -18,7 +18,7 @@ const BorrowBookModal = ({ studentDetails, selectedBooks, onClose, onConfirm, on
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-800 bg-opacity-75">
-      <div className="bg-white p-6 rounded-lg w-1/2">
+      <div className="bg-white p-6 rounded-lg w-5/6 md:w-1/2">
         <h2 className="text-2xl font-bold mb-4">Confirm Borrow</h2>
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">Student ID</label>

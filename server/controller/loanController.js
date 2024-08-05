@@ -3,14 +3,19 @@ import Book from "../schemas/bookSchema.js";
 import Loan from "../schemas/loanSchema.js";
 import Student from "../schemas/studentSchema.js";
 import { generateQRCode } from "../utils/qrCodeHelper.js";
+import Admin from "../schemas/adminSchema.js";
 import { sendEmail } from "../utils/emailHelper.js";
 
 export const addLoan = async (req, res) => {
-  const { studentId, bookCopyCodes } = req.body;
+  const { studentId, bookCopyCodes, issuedBy } = req.body;
+  console.log('isss:', issuedBy);
+  console.log('studentId:', studentId);
+  console.log('bookCopyCodes:', bookCopyCodes);
+  console.log('issuedBy:', issuedBy);
 
   // Validate ObjectIds
-  if (!mongoose.Types.ObjectId.isValid(studentId)) {
-    return res.status(400).json({ message: "Invalid student ID" });
+  if (!mongoose.Types.ObjectId.isValid(studentId) || !mongoose.Types.ObjectId.isValid(issuedBy)) {
+    return res.status(400).json({ message: "Invalid student ID or admin ID" });
   }
 
   // Validate bookCopyCodes
@@ -23,6 +28,12 @@ export const addLoan = async (req, res) => {
     const student = await Student.findById(studentId);
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
+    }
+
+    // Check if admin exists
+    const admin = await Admin.findById(issuedBy);
+    if (!admin) {
+      return res.status(404).json({ message: "Admin not found" });
     }
 
     // Find books with the given copy codes
@@ -63,6 +74,7 @@ export const addLoan = async (req, res) => {
     // Create a new loan
     const loan = new Loan({
       studentId,
+      issuedBy,
       bookCopyCodes,
       bookDetails: books.map(book => book._id),
       status: "borrowed",

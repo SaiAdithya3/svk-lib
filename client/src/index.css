@@ -49,3 +49,15 @@ body {
   bottom: 0;
   overflow: hidden;
 }
+
+
+/* Add this to your CSS file */
+@media (max-width: 768px) {
+  .sidebar-hidden {
+    transform: translateX(-100%);
+  }
+
+  .sidebar-visible {
+    transform: translateX(0);
+  }
+}
