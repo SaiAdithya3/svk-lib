@@ -14,7 +14,11 @@ const BooksCatalogue = () => {
   const [loading, setLoading] = useState(false);
   const [debounceTimeout, setDebounceTimeout] = useState(null);
   const [bankai, setBankai] = useState('');
+  // const [worthy, setWorthy] = useState('');
   const roleType = localStorage.getItem("userType");
+  const user = JSON.parse(localStorage.getItem("user"));
+  const worthy = roleType === "admin" ? user.admin.role : '';
+  // console.log(worthy);
   const navigate = useNavigate();
 
   const fetchBooks = async (page, search) => {
@@ -109,7 +113,7 @@ const BooksCatalogue = () => {
                 <th className="px-4 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">Author</th>
                 <th className="px-2 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">Copies</th>
                 <th className="px-4 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">Location</th>
-                {roleType === 'admin' && (
+                {worthy === 'admin' && (
                   <th className="px-4 py-3.5 border-b border-gray-200 bg-gray-100 text-left text-md font-semibold text-gray-600 tracking-wider">Edit</th>
                 )}
               </tr>
@@ -123,7 +127,7 @@ const BooksCatalogue = () => {
                   <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.author}</td>
                   <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.copies.filter(copy => copy.status === 'available').length} / {book.copies.length}</td>
                   <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">{book.location}</td>
-                  {roleType === 'admin' && (
+                  {worthy === 'admin' && (
                     <td className="px-4 py-4 border-b border-gray-200 text-sm text-gray-700">
                       <Pencil className='size-7 border p-1.5 rounded-lg' />
                     </td>

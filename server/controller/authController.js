@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import Admin from '../schemas/adminSchema.js';
-import Student from '../schemas/studentSchema.js'; // Assuming you have a student schema
+import Student from '../schemas/studentSchema.js'; 
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 
@@ -8,7 +8,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 export const adminLogin = async (req, res) => {
   const { email, password } = req.body;
 
-  console.log('Admin login request body:', req.body); // Ensure it logs { email: 'admin@gmail.com', password: 'admin' }
+  console.log('Admin login request body:', req.body);
 
   try {
     if (typeof email !== 'string' || typeof password !== 'string') {
@@ -24,8 +24,8 @@ export const adminLogin = async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({ id: admin._id, role: 'admin' }, JWT_SECRET, { expiresIn: '1h' });
-    res.status(200).json({ token, admin: { id: admin._id, email: admin.email } });
+    const token = jwt.sign({ id: admin._id, role: 'admin' }, JWT_SECRET, { expiresIn: '24h' });
+    res.status(200).json({ token, admin: { id: admin._id, email: admin.email, name: admin.name, role: admin.role } });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -36,14 +36,12 @@ const formatDateString = (dateStr) => {
   return `${day}-${month}-${year}`;
 };
 
-// Student login function
 export const studentLogin = async (req, res) => {
-  const { email, password } = req.body; // Expecting email and password in request body
-
+  const { email, password } = req.body; 
   console.log('Student login request body:', req.body); // Log to ensure correct data
 
   const dob = formatDateString(password); 
-  console.log('Formatted DOB:', dob); // Log formatted date of birth
+  console.log('Formatted DOB:', dob);
 
   try {
     if (typeof email !== 'string' || typeof password !== 'string') {
@@ -56,7 +54,7 @@ export const studentLogin = async (req, res) => {
       return res.status(404).json({ message: 'Student not found' });
     }
 
-    // Convert input date string from 'dd-mm-yyyy' to 'yyyy-mm-dd' format
+   
     const inputDob = dob;
     const studentDob = await student.dob;
 

@@ -10,11 +10,14 @@ const Dashboard = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState("");
   const navigate = useNavigate();
+  const [user, setUser] = useState({});
 
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem("token");
-      console.log("Token:", token);
+      const profile = localStorage.getItem("user");
+      setUser(JSON.parse(profile));
+      // console.log("Token:", token);
 
       if (!token) {
         navigate("/");
@@ -36,15 +39,17 @@ const Dashboard = () => {
   }, [navigate]);
 
   if (!isAuthenticated) {
-    return <div>Loading...</div>; // Or a loader component
+    return <div>Loading...</div>;
   }
+  const bankai = userRole === "admin" ? user.student : user.admin;
+  // console.log(bankai)
 
   return (
     <>
       <div className="w-full flex flex-col gap-4 px-4 py-4 items-center">
         <div className="w-full px-4 flex py-5 gap-5">
           <div className="w-1/3 flex bg-gradient-to-r gap-2 from-violet-200 to-pink-200 rounded-3xl text-violet-950 items-start px-8 flex-col py-10 ">
-            <h1 className="text-3xl font-bold">Hello Sreeram 👋!</h1>
+            <h1 className="text-3xl font-bold">Hello {bankai && bankai.name} 👋!</h1>
             <p className="text-lg popp">Welcome to the dashboard</p>
           </div>
           <div className="w-2/3 stats shadow border">

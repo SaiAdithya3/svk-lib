@@ -45,11 +45,16 @@ const fines = [
   // Add more items as needed
 ];
 const SDashboard = () => {
+  const userType = localStorage.getItem("userType");
+  const user = JSON.parse(localStorage.getItem("user"));
+  const bankai = userType === "student" ? user.student : user.admin;
+  console.log(bankai);
+  
   return (
     <div className="flex flex-col items-center gap-10 justify-center h-full mt-4">
       <div className="w-full flex-col justify-center items-center px-4 flex py-5 gap-5">
         <div className="w-full flex bg-gradient-to-r gap-2 from-violet-200 to-pink-200 rounded-3xl text-violet-950 items-start px-8 flex-col py-10 ">
-          <h1 className="text-3xl font-bold">Hello Sreeram 👋!</h1>
+          <h1 className="text-3xl font-bold">Hello {bankai && bankai?.name} 👋!</h1>
           <p className="text-lg popp">Welcome to the dashboard</p>
         </div>
         <div className="w-2/3 stats flex items-center ">

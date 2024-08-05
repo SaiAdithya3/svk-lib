@@ -42,6 +42,7 @@ const Login = () => {
       localStorage.setItem('userType', userType); 
       toast.success(`Logged in as ${userType}`);
       console.log(response);
+      localStorage.setItem('user', JSON.stringify(response));
       navigate(userType === "admin" ? "/dashboard" : "/student-dashboard");
     } catch (error) {
       toast.error(error.message || "Login failed");
@@ -49,9 +50,9 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-around">
+    <div className="min-h-screen flex flex-col md:flex-row items-center justify-around">
       <ImageSection imageUrl={logoImg} />
-      <div className="border-l h-screen w-1/2 items-center flex flex-col justify-center p-8">
+      <div className="border-l h-screen w-full md:w-1/2 items-center flex flex-col justify-center p-8">
         <h1 className="text-2xl font-bold mb-6 text-black">
           Welcome to SKU Library Management System
         </h1>
@@ -70,7 +71,7 @@ const Login = () => {
 
 const ImageSection = ({ imageUrl }) => {
   return (
-    <div className="w-1/3 h-1/3">
+    <div className="w-full md:w-1/3 h-1/3">
       <img src={imageUrl} alt="Library" className="w-full h-full object-cover" />
     </div>
   );
@@ -110,7 +111,7 @@ const LoginForm = ({
   }, []);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 w-[70%]">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 w-full md:w-[70%]">
       <div className="w-full">
         <label htmlFor="userType" className="block text-lg font-semibold text-black">
           Login as

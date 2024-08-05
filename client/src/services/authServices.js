@@ -41,9 +41,7 @@ export const validateAdminToken = async (token) => {
         'Authorization': `Bearer ${token}`
       }
     });
-    console.log(response)
-    // Assuming response contains the validation status and user role
-    return { isValid: true, role: response.data.role }; // Adjust as per your backend response
+    return { isValid: true, role: response.data.role }; 
   } catch (error) {
     throw new Error(error.response.data.message || 'Admin token validation failed');
   }

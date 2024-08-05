@@ -8,6 +8,7 @@ import {
   ChartColumn,
 } from "lucide-react";
 import bankai from "../assets/bankai.png";
+// import {toast } from 'sonner';
 
 const Icon = ({ IconComponent, ...props }) => (
   <IconComponent {...props} className="w-5 h-5" />
@@ -42,6 +43,17 @@ const NavSection = ({ title, children }) => (
 
 const Sidebar = () => {
   const roleType = localStorage.getItem("userType");
+  const profile = JSON.parse(localStorage.getItem("user"));
+  const bankaid = roleType === "admin" ? profile.admin : profile.student;
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("userType");
+    // toast.success("Logged out successfully");
+    window.location.href = "/";
+  };
+  // console.log(bankaid);
   return (
     <div className="flex sticky top-0 h-screen bg-gray-100">
       <aside className="w-64 flex flex-col justify-between bg-white border-r">
@@ -106,14 +118,25 @@ const Sidebar = () => {
             </NavItem>
           </div>
         </div>
+        <div className="w-full flex flex-col items-center">
 
-        <div className="hover:bg-zinc-100 group cursor-pointer flex items-center p-4 border-t">
-          {/* <Avatar name="banaki" variant="beam" /> */}
-          <div className="ml-3">
-            <h3 className="text-sm font-semibold">Bankai muz</h3>
-            <p className="text-xs text-muted-foreground">info@devatoms.com</p>
+          <div className="w-full flex items-center p-2">
+            <button onClick={handleLogout} className="w-full flex items-center justify-center p-2 bg-red-500 text-white rounded-lg">
+              Logout
+            </button>
           </div>
-          {/* <HiMiniChevronRight className="text-2xl mx-2 group-hover:translate-x-2 transition-all" /> */}
+          <div className="hover:bg-zinc-100 group cursor-pointer flex items-center p-4 border-t">
+            {/* <Avatar name="banaki" variant="beam" /> */}
+            <div className="ml-3">
+              <h3 className="text-sm font-semibold">
+                {bankaid && bankaid.name}
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                {bankaid && bankaid.email}
+              </p>
+            </div>
+            {/* <HiMiniChevronRight className="text-2xl mx-2 group-hover:translate-x-2 transition-all" /> */}
+          </div>
         </div>
       </aside>
     </div>
