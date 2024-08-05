@@ -206,6 +206,9 @@ export const getBookLoans = async (req, res) => {
 
 export const getAllLoans = async (req, res) => {
   try {
+    const { page = 1, limit = 10 } = req.query;
+    const skip = (page - 1) * limit;
+
     const loans = await Loan.find({})
       .populate({
         path: 'studentId',
@@ -218,17 +221,22 @@ export const getAllLoans = async (req, res) => {
       .populate({
         path: 'bookDetails',
         select: 'title author isbn'
-      });
+      })
+      .populate({
+        path: 'issuedBy',
+        select: 'name email'
+      })
+      .skip(skip)
+      .limit(parseInt(limit));
 
-    if (!loans.length) {
-      return res.status(404).json({ error: "No loans found" });
-    }
+    const totalLoans = await Loan.countDocuments();
 
-    return res.status(200).json({ loans });
+    return res.status(200).json({ loans, totalLoans });
   } catch (error) {
     return res.status(500).json({ error: "Server error", details: error.message });
   }
 };
+
 
 export const getLoanById = async (req, res) => {
   const { id } = req.params;
@@ -287,5 +295,44 @@ export const unreturnedBooks = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+
+
+export const getStudentLoans = async (req, res) => {
+  try {
+    const { studentId } = req.params;
+
+    // Validate the studentId
+    if (!mongoose.Types.ObjectId.isValid(studentId)) {
+      return res.status(400).json({ error: 'Invalid student ID' });
+    }
+
+    const loans = await Loan.find({ studentId })
+      .populate({
+        path: 'studentId',
+        select: 'name email'
+      })
+      .populate({
+        path: 'bookCopyCodes',
+        select: 'title author isbn'
+      })
+      .populate({
+        path: 'bookDetails',
+        select: 'title author isbn'
+      })
+      .populate({
+        path: 'issuedBy',
+        select: 'name email'
+      });
+
+    if (!loans.length) {
+      return res.status(404).json({ error: 'No loans found for this student' });
+    }
+
+    return res.status(200).json({ loans });
+  } catch (error) {
+    return res.status(500).json({ error: 'Server error', details: error.message });
   }
 };

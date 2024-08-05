@@ -86,12 +86,14 @@ const BooksCatalogue = () => {
             onChange={handleSearchChange}
           />
         </div>
-        <button
-          className="px-4 py-2 bg-zinc-800 shadow text-white rounded-lg"
-          onClick={() => navigate('/addnew')}
-        >
-          Add a New Book
-        </button>
+        {roleType === "admin" && (
+          <button
+            className="px-4 py-2 bg-zinc-800 shadow text-white rounded-lg"
+            onClick={() => navigate('/addnew')}
+          >
+            Add a New Book
+          </button>
+        )}
       </div>
 
       {loading ? (

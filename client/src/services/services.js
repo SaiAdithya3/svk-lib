@@ -105,24 +105,25 @@ export const searchStudentById = async (studentId) => {
     }
 };
 
-export const fetchAllLoans = async () => {
-    try {
-      const response = await fetch(`${BASE_URL}/loan/all-loans`);
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
-  
-      if (!Array.isArray(data.loans)) {
-        throw new Error('Expected data.loans to be an array');
-      }
-  
-      return data.loans; 
-    } catch (error) {
-      console.error('Error fetching all loans:', error);
-      throw error;
+export const fetchAllLoans = async (page = 1, limit = 10) => {
+  try {
+    const response = await fetch(`${BASE_URL}/loan/all-loans?page=${page}&limit=${limit}`);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
     }
-  };
+    const data = await response.json();
+
+    if (!Array.isArray(data.loans)) {
+      throw new Error('Expected data.loans to be an array');
+    }
+
+    return { loans: data.loans, totalLoans: data.totalLoans };
+  } catch (error) {
+    console.error('Error fetching all loans:', error);
+    throw error;
+  }
+};
+
   
 export const unreturnedBooks1 = async () => {
     try {
@@ -148,3 +149,22 @@ export const returnBook = async (loanId) => {
         throw error;
     }
 }
+
+export const fetchStudentLoans = async (studentId) => {
+  try {
+    const response = await fetch(`${BASE_URL}/loan/student/${studentId}`);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const data = await response.json();
+
+    if (!Array.isArray(data.loans)) {
+      throw new Error('Expected data.loans to be an array');
+    }
+
+    return data.loans;
+  } catch (error) {
+    console.error('Error fetching student loans:', error);
+    throw error;
+  }
+};

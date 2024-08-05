@@ -8,6 +8,7 @@ import {
   getAllLoans,
   unreturnedBooks,
   getLoanById,
+  getStudentLoans
 } from "../controller/loanController.js";
 import { validateAdminToken } from "../utils/middleWare.js";
 
@@ -26,5 +27,6 @@ router.get("/unreturned-books", unreturnedBooks);
 router.get("/loansbybook/:bookId", getBookLoans);
 
 router.get("/getloanbyid/:id", getLoanById);
+router.get("/student/:studentId", getStudentLoans);
 
 export default router;

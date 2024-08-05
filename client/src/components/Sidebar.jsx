@@ -108,12 +108,12 @@ const Sidebar = () => {
                     <NavItem to="/returnbooks" icon={BookCheck}>
                       Return Books
                     </NavItem>
-                    <NavItem to="/students" icon={GroupIcon}>
+                    {/* <NavItem to="/students" icon={GroupIcon}>
                       Students
-                    </NavItem>
-                    <NavItem to="/overdues" icon={Clock8}>
+                    </NavItem> */}
+                    {/* <NavItem to="/overdues" icon={Clock8}>
                       Overdues
-                    </NavItem>
+                    </NavItem> */}
                     <NavItem to="/activity" icon={ChartColumn}>
                       Activity log
                     </NavItem>
@@ -127,7 +127,7 @@ const Sidebar = () => {
                     <NavItem to="/books" icon={Library}>
                       Search Books
                     </NavItem>
-                    <NavItem to="/activity" icon={ChartColumn}>
+                    <NavItem to="/student-activity" icon={ChartColumn}>
                       My Activity log
                     </NavItem>
                   </>
@@ -144,7 +144,8 @@ const Sidebar = () => {
                 Logout
               </button>
             </div>
-            <div className="hover:bg-zinc-100 group cursor-pointer flex items-center p-4 border-t">
+            <div className="hover:bg-zinc-100 group cursor-pointer flex items-center justify-start w-full p-4 border-t">
+              <img src={'https://avatar.iran.liara.run/public/boy?username=' + bankaid?.name} className="w-10 h-10 rounded-full" alt="Profile" />
               <div className="ml-3">
                 <h3 className="text-sm font-semibold">
                   {bankaid && bankaid.name}

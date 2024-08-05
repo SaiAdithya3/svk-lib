@@ -1,5 +1,6 @@
 import React from "react";
 import { Search, Handshake, BookText, Clock5 } from "lucide-react";
+import {useNavigate} from "react-router-dom";
 
 // Sample data for recent borrowings
 
@@ -49,6 +50,7 @@ const SDashboard = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   const bankai = userType === "student" ? user.student : user.admin;
   console.log(bankai);
+  const navigate = useNavigate();
   
   return (
     <div className="flex flex-col items-center gap-10 justify-center h-full mt-4">
@@ -59,7 +61,11 @@ const SDashboard = () => {
         </div>
         <div className="w-2/3 stats flex items-center ">
           
-          <div className="flex gap-1 items-center border border-slate-300 bg-zinc-50 px-3 w-[90%] rounded-xl">
+          <div className="flex gap-1 items-center border border-slate-300 bg-zinc-50 px-3 w-[90%] rounded-xl"
+            onClick={() => {
+              navigate("/books");
+            }}
+          >
             <Search className="size-5" />
             <input
               type="text"

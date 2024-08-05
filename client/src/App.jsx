@@ -12,6 +12,7 @@ import Navbar from "./components/Navbar";
 import AddNewBook from "./components/AddNewBook";
 import { Toaster } from "sonner";
 import StudentDashboard from "./pages/SDashboard"; // Import student dashboard
+import StudentActivityLog from "./pages/StudentActivityLog";
 
 const App = () => {
   const location = useLocation();
@@ -52,6 +53,7 @@ const App = () => {
             <Route path="/returnbooks" element={<ReturnBooks />} />
             <Route path="/overdues" element={<Overdue />} />
             <Route path="/activity" element={<ActivityLog />} />
+            <Route path="/student-activity" element={<StudentActivityLog />} />
             <Route path="/addnew" element={<AddNewBook />} />
             <Route path="/student-dashboard" element={<StudentDashboard />} />
             <Route path="*" element={<Dashboard />} />
