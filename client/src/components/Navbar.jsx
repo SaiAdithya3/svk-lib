@@ -12,12 +12,13 @@ const Navbar = () => {
   
   return (
     <>
-      <div className="navbar sticky top-0 border-b bg-white/60 backdrop-blur-sm border-zinc-200">
+      <div className="navbar flex w-full p-2 justify-between sticky top-0 border-b bg-white/60 backdrop-blur-sm border-zinc-200">
         <div className="navbar-start flex text-sm font-semibold px-5 breadcrumbs">
-            <ul>
+            <ul className='flex items-center gap-1'>
               <li>
                 <Link to='/'>Dashboard</Link>
                 </li>
+                /
               <li>
                 <a>{breadCrumbPath}</a>
                 </li>
@@ -30,7 +31,7 @@ const Navbar = () => {
           </div>
         </div>
         <div className="navbar-end">
-          <button className="btn btn-ghost btn-circle">
+          <button className="btn p-2  btn-ghost btn-circle">
             <User />
           </button>
           <button className="btn btn-ghost btn-circle">
