@@ -15,7 +15,7 @@ const app = express();
 // Middleware
 app.use(cors({
   // origin: 'http://localhost:5173',
-  origin: 'https://sku-lms.vercel.app/',
+  origin: 'https://sku-lms.vercel.app',
   credentials: true
 }));
 app.use(bodyParser.json());
