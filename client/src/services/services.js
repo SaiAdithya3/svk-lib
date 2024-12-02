@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { toast } from 'sonner';
 import { getToken } from './getToken';
-const BASE_URL = 'http://localhost:3000';
+// const BASE_URL = 'http://localhost:3000';
+const BASE_URL = 'https://sku-lms.onrender.com';
 
   
   export const addBook = async (book) => {

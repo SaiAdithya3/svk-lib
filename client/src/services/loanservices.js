@@ -1,6 +1,7 @@
 import axios from "axios";
 import { toast } from "sonner";
-const BASE_URL = "http://localhost:3000";
+// const BASE_URL = "http://localhost:3000";
+const BASE_URL = "https://sku-lms.onrender.com";
 
 export const getLoanById = async (id) => {
   if (!id) {
